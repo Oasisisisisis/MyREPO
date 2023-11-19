@@ -1,0 +1,127 @@
+/* header {
+    grid-column: 1 / 13;
+    grid-row: 1;
+    
+  }
+  
+  article {
+    grid-column: 4 / 13;
+    grid-row: 2;
+    flex: 1;
+  }
+  
+  aside {
+    grid-column: 1 / 4;
+    grid-row: 2;
+  }
+  
+  footer {
+    grid-column: 1 / 13;
+    grid-row: 3;
+  }
+  
+section{
+    flex-wrap: wrap;
+    flex: 200px;
+    flex-direction: row;
+    
+} */
+
+
+
+
+/* html {
+    font-family: sans-serif;
+  } */
+
+  html,body {
+    margin: 0;
+  }
+
+  header {
+    
+    background: purple;
+    /* height: 100px;
+    margin: 0; */
+  }
+
+  h1 {
+    text-align: center;
+    color: white;
+    line-height: 100px;
+    margin: 0;
+  }
+
+  article {
+    width: 265px; /* 設定固定的寬度 */
+    height: 400px;
+    padding: 10px;
+    margin: 10px;
+    background: lightblue;
+    text-align: center;
+  }
+
+  article img {
+    max-width: 100%; /* 圖片最大寬度不超過父元素（<article>）的寬度 */
+    height: auto; /* 保持長寬比 */
+    display: inline-block; /* 設置為行內塊元素，以便使用 text-align: center; 生效 */
+    margin: 0 auto; 
+}
+
+h3{
+    color: blue;
+}
+button {
+    width: 100%;
+    /* padding: 10px;  */
+    height: 30px;
+    flex: 1 auto;
+    margin: 5px;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+
+  /* button {
+    width: 100%;
+    height: 20px;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+} */
+
+
+
+
+  /* Add your flexbox CSS below here */
+
+  section {
+    display: flex;
+  }
+
+body {
+    /* width: 90%;
+    max-width: 900px; */
+    margin: 0 auto;
+    font: .9em/1.2 Arial, Helvetica, sans-serif;
+}
+
+.container {
+    display: grid;
+    grid-template-rows: repeat(12, minmax(0,1fr));
+    gap: 20px;
+}
+
+/* header,
+footer {
+    border-radius: 5px;
+    padding: 10px;
+    background-color: rgb(207,232,220);
+    border: 2px solid rgb(79,185,227);
+} */
+
+aside {
+    border-right: 1px solid #999;
+}
