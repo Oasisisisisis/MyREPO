@@ -4,10 +4,23 @@
     <title>ShoppingKart Main Page</title>
 </head>
 <body>
-    <h1>我的商品</h1><br>
+    <h1>My product</h1><br>
     <hr>
     <div id="product">
-
+        <form id="myForm">
+        
+            商品名稱: <input name="name" type="text"/><br/>
+            <br/>
+            價錢: <textarea name='price'></textarea><br/>
+            <br/>
+            商品說明: <textarea name='detail'></textarea><br/>
+            <br/>
+        
+            <input type='button' value="save">
+            <hr>
+            <!--
+                這裡輸出商品清單，按下save後會更新底下的表格
+            -->
     </div>
 
 </body>    
