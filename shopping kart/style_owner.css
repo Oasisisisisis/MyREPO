@@ -1,0 +1,17 @@
+html,body {
+    margin: 0;
+  }
+
+  header {
+    
+    background: rgb(0, 17, 128);
+    /* height: 100px;
+    margin: 0; */
+  }
+
+  h1 {
+    text-align: center;
+    color: white;
+    line-height: 100px;
+    margin: 0;
+  }
