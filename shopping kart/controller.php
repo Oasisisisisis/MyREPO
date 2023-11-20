@@ -6,12 +6,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $name = $_POST["name"];
         $price = $_POST["price"];
         $detail = $_POST["detail"];
+        $remain = $_POST["remain"]; 
 
-        // 將商品資訊插入資料庫
-        $query = "INSERT INTO products (name, price, detail) VALUES ('$name', '$price', '$detail')";
-        mysqli_query($db, $query) or die(mysqli_error($db));
-        
-        echo "Product added successfully!";
+
+        // 插入商品數據到資料庫
+        $query = "INSERT INTO product (name, price, detail, remain) VALUES ('$name', '$price', '$detail', '$remain')";
+        $result = mysqli_query($db, $query);
+
+        if ($result) {
+            echo "Product added successfully!";
+        } else {
+            echo "Error adding product: " . mysqli_error($db);
+        }
     }
 }
 ?>

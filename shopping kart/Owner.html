@@ -1,11 +1,11 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="style_owner.css">
 <head>
     <title>ShoppingKart Main Page</title>
 </head>
 <body>
-    <h1>My product</h1><br>
-    <hr>
+    <header><h1>My product</h1></header>
     <div id="product">
         <form id="myForm">
             商品名稱: <input name="name" type="text"/><br/>
@@ -13,6 +13,8 @@
             價錢: <textarea name='price'></textarea><br/>
             <br/>
             商品說明: <textarea name='detail'></textarea><br/>
+            <br/>
+            庫存: <input name="remain" type="number" min="0" value="0" /><br/> <!-- 新增庫存欄位 -->
             <br/>
             <input type='button' value="save" onclick="saveProduct()">
             <hr>
@@ -25,6 +27,7 @@
             var name = document.getElementsByName('name')[0].value;
             var price = document.getElementsByName('price')[0].value;
             var detail = document.getElementsByName('detail')[0].value;
+            var remain = document.getElementsByName('remain')[0].value; // 取得庫存值
 
             // 使用 AJAX 將商品資訊傳送到後端處理
             var xhr = new XMLHttpRequest();
@@ -37,11 +40,12 @@
                     document.getElementsByName('name')[0].value = '';
                     document.getElementsByName('price')[0].value = '';
                     document.getElementsByName('detail')[0].value = '';
+                    document.getElementsByName('remain')[0].value = '0'; // 清空庫存
                 }
             };
             xhr.open("POST", "controller.php", true);
             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            xhr.send("action=addProduct&name=" + name + "&price=" + price + "&detail=" + detail);
+            xhr.send("action=addProduct&name=" + name + "&price=" + price + "&detail=" + detail + "&remain=" + remain);
         }
     </script>
 </body>    
