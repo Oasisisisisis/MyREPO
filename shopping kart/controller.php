@@ -15,7 +15,7 @@ switch ($act) {
         $jsonStr = $_POST['dat'];
         $product = json_decode($jsonStr);
         // 需要進行驗證
-        addProduct($product->name, $product->price, $product->detail, $product->remain);
+        addProduct($product->name, $product->price, $product->detail, $product->remain, $product->id);
         return;
     case "del":
         $id = (int)$_REQUEST['id'];
