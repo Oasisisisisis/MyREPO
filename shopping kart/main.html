@@ -2,27 +2,43 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="stylesheet" href="style.css" >
+  <script type="text/javascript" src="https://unpkg.com/vue@next"></script>
   <script>
-  function loadURL(URL) {
-	//向URL發出request
-	fetch(URL,{
-		method: 'POST', // or 'GET'
-	})
-	.then(function(res){ //fetch的callback function，傳回值是promise物件: res
-		//將res的內容轉為文字，傳給下一個Callback function
-		return res.text();
-	})
-	.then(function(data){ //下一個callback function，參數data是上一個callback傳進來的文字
-		
-		//找到要顯示內容的div
-		let div = document.getElementById('main');
-		//將傳進來的文字放進div中
-		div.innerHTML=data;
-	})
+
+    const productApp = Vue.createApp({
+      data() {
+        return {
+          UI: 'main',
+          dat: [],
+          newProduct: {
+            id: -1,
+            name: '',
+            price: '',
+            detail: '',
+            remain: ''
+          }
+        }
+      },
+      methods: {
+        loadList: function () {
+          const that = this;
+          fetch('controller.php?act=listProduct')
+            .then(function (response) {
+              return response.json();
+            })
+            .then(function (myJson) {
+              that.dat = myJson;
+            });
+        }
+        },
+      created() {
+        this.loadList();
+      }
+    }).mount("#main");
 
 
 
-}
+
     let cart = []; // 儲存購物車內容的陣列
 
 function openModal() {
@@ -92,7 +108,28 @@ addToCart(item2);
       </div>
     </div>
 
-    <button onclick="loadURL('ProductList.php')"> Load Products</button>
+
+    <div id="main">
+        <div id="list" v-if="UI=='main'">
+            <table border=1>
+                <tr>
+                  <td>序號</td>
+                  <td>商品名稱</td>
+                  <td>價格</td>
+                  <td>內容說明</td>
+                  <td>存貨數量</td>
+                </tr>
+                <tr v-for="product in dat">
+                  <td>{{product.id}}</td>
+                  <td>{{product.name}}</td>
+                  <td>{{product.price}}</td>
+                  <td>{{product.detail}}</td>
+                  <td>{{product.remain}}</td>
+                </tr>
+              </table>
+        </div>
+
+    </div>
 
 </body>   
 </html>
