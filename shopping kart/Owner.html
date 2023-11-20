@@ -1,26 +1,29 @@
 <html>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link rel="stylesheet" href="style_owner.css" >
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="style_owner.css" >
     <title>ShoppingKart Main Page</title>
 </head>
 <body>
     <header><h1>My product</h1></header>
     <div id="product">
-        <form id="myForm">
+        <form id="myForm" method="post">
         
             商品名稱: <input name="name" type="text"/><br/>
             <br/>
             價錢: <textarea name='price'></textarea><br/>
             <br/>
+            數量: <textarea name='remain'></textarea><br/>
+            <br/>
             商品說明: <textarea name='detail'></textarea><br/>
             <br/>
-        
+            
             <input type='button' value="save">
             <hr>
             <!--
                 這裡輸出商品清單，按下save後會更新底下的表格，同時更新資料庫
             -->
+        </form>
     </div>
 
 </body>    
