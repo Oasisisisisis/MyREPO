@@ -1,45 +1,24 @@
 <html>
-<<<<<<< HEAD
-=======
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" href="style_owner.css">
->>>>>>> 7243a23ff1a1cb24da287b2898774b8c13c0d2f2
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="stylesheet" href="style_owner.css" >
     <title>ShoppingKart Main Page</title>
 </head>
 <body>
     <header><h1>My product</h1></header>
     <div id="product">
-<<<<<<< HEAD
-        <form id="myForm" method="post">
-        
-=======
         <form id="myForm">
->>>>>>> 7243a23ff1a1cb24da287b2898774b8c13c0d2f2
             商品名稱: <input name="name" type="text"/><br/>
             <br/>
             價錢: <textarea name='price'></textarea><br/>
             <br/>
-            數量: <textarea name='remain'></textarea><br/>
-            <br/>
             商品說明: <textarea name='detail'></textarea><br/>
             <br/>
-<<<<<<< HEAD
-            
-            <input type='button' value="save">
-            <hr>
-            <!--
-                這裡輸出商品清單，按下save後會更新底下的表格，同時更新資料庫
-            -->
-=======
-            庫存: <input name="remain" type="number" min="0" value="0" /><br/> <!-- 新增庫存欄位 -->
+            庫存: <input name="remain" type="number" min="0" value="0" /><br/> 
             <br/>
             <input type='button' value="save" onclick="saveProduct()">
             <hr>
             <div id="resultMessage"></div> 
->>>>>>> 7243a23ff1a1cb24da287b2898774b8c13c0d2f2
         </form>
     </div>
 
@@ -48,23 +27,25 @@
             var name = document.getElementsByName('name')[0].value;
             var price = document.getElementsByName('price')[0].value;
             var detail = document.getElementsByName('detail')[0].value;
+            var remain = document.getElementsByName('remain')[0].value;
 
             // 使用 AJAX 將商品資訊傳送到後端處理
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == 4 && xhr.status == 200) {
                     console.log(xhr.responseText);
-                    document.getElementById('resultMessage').innerText = xhr.responseText; // 顯示結果訊息
+                    document.getElementById('resultMessage').innerText = xhr.responseText; 
 
                     // 清空表單資訊
                     document.getElementsByName('name')[0].value = '';
                     document.getElementsByName('price')[0].value = '';
                     document.getElementsByName('detail')[0].value = '';
+                    document.getElementsByName('remain')[0].value = '0'; // 清空庫存
                 }
             };
             xhr.open("POST", "controller.php", true);
             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            xhr.send("action=addProduct&name=" + name + "&price=" + price + "&detail=" + detail);
+            xhr.send("action=addProduct&name=" + name + "&price=" + price + "&detail=" + detail + "&remain=" + remain);
         }
     </script>
 </body>    
