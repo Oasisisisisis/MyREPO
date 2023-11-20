@@ -2,12 +2,76 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="stylesheet" href="style.css" >
+  <script>
+    let cart = []; // 儲存購物車內容的陣列
+
+function openModal() {
+    updateCart(); // 更新購物車內容
+    document.getElementById('cartModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('cartModal').style.display = 'none';
+}
+
+function addToCart(item) {
+    cart.push(item);
+    updateCart();
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateCart();
+}
+
+function updateCart() {
+    const cartItemsElement = document.getElementById('cartItems');
+    const totalPriceElement = document.getElementById('totalPrice');
+
+    // 清空購物車內容
+    cartItemsElement.innerHTML = '';
+
+    // 更新購物車內容
+    cart.forEach((item, index) => {
+        const itemElement = document.createElement('div');
+        itemElement.innerHTML = `
+            <p>${item.name} - 單價: $${item.price} - 數量: 1
+            <button onclick="removeFromCart(${index})">移除</button></p>
+        `;
+        cartItemsElement.appendChild(itemElement);
+    });
+
+    // 計算總價
+    const totalPrice = cart.reduce((total, item) => total + item.price, 0);
+    totalPriceElement.textContent = `總價: $${totalPrice}`;
+}
+
+// 假設有兩個商品
+const item1 = { name: '商品1', price: 10 };
+const item2 = { name: '商品2', price: 20 };
+
+// 加入一些商品到購物車（根據實際情況調用 addToCart 函數）
+addToCart(item1);
+addToCart(item2);
+
+  </script>
 </head>
 <body>
     <header>
         <h1>ONLINE SHOP SITE--THE FIRST GROUP</h1>
     </header>
     
+    <button onclick="openModal()">查看購物車</button>
+    <!-- 購物車模態框 -->
+    <div id="cartModal" class="modal">
+      <div class="modal-content">
+          <span class="close" onclick="closeModal()">&times;</span>
+          <h2>購物車內容</h2>
+          <div id="cartItems"></div>
+          <p id="totalPrice">總價: $0</p>
+      </div>
+    </div>
+
     <div class="container">
         <section>
             <article>
