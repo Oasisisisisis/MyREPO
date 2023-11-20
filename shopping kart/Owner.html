@@ -1,52 +1,122 @@
 <html>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link rel="stylesheet" href="style_owner.css">
 <head>
-    <title>ShoppingKart Main Page</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <script type="text/javascript" src="https://unpkg.com/vue@next"></script>
 </head>
+
 <body>
-    <header><h1>My product</h1></header>
-    <div id="product">
-        <form id="myForm">
-            商品名稱: <input name="name" type="text"/><br/>
-            <br/>
-            價錢: <textarea name='price'></textarea><br/>
-            <br/>
-            商品說明: <textarea name='detail'></textarea><br/>
-            <br/>
-			庫存: <input name="remain" type="number" min="0" value="0" /><br/>
-			<br/> 
-            <input type='button' value="save" onclick="saveProduct()">
-            <hr>
-            <div id="resultMessage"></div> 
-        </form>
+  <hr />
+  <div id="main">
+    <div id="list" v-if="UI=='main'">
+      <h1>This is the main page.</h1>
+      <button @click="setAddUI()">Load Add Form</button>
+      <table border=1>
+        <tr>
+          <td>序號</td>
+          <td>商品名稱</td>
+          <td>價格</td>
+          <td>內容說明</td>
+          <td>存貨數量</td>
+          <td>-</td>
+        </tr>
+        <tr v-for="product in dat">
+          <td>{{product.id}}</td>
+          <td>{{product.name}}</td>
+          <td>{{product.price}}</td>
+          <td>{{product.detail}}</td>
+          <td>{{product.remain}}</td>
+          <td>
+            <button @click="del(product.id)">刪</button><button @click="setEditUI(product)">改</button>
+          </td>
+        </tr>
+      </table>
     </div>
+    <div v-if="UI=='editForm'">
+      商品名稱: <input type="text" v-model="newProduct.name" /> <br />
+      價錢: <input type="text" v-model="newProduct.price" /> <br />
+      商品說明: <textarea v-model="newProduct.detail"></textarea><br />
+      庫存: <input type="number" v-model="newProduct.remain"><br />
+      <input type='button' @click="addProduct()" value="save">
+    </div>
+  </div>
 
-    <script>
-        function saveProduct() {
-            var name = document.getElementsByName('name')[0].value;
-			var price = document.getElementsByName('price')[0].value;
-			var detail = document.getElementsByName('detail')[0].value;
-			var remain = document.getElementsByName('remain')[0].value;
-
-            // 使用 AJAX 將商品資訊傳送到後端處理
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    console.log(xhr.responseText);
-                    document.getElementById('resultMessage').innerText = xhr.responseText; // 顯示結果訊息
-
-                    // 清空表單資訊
-                    document.getElementsByName('name')[0].value = '';
-                    document.getElementsByName('price')[0].value = '';
-                    document.getElementsByName('detail')[0].value = '';
-                }
-            };
-			xhr.open("POST", "controller.php", true);
-			xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			xhr.send("action=addProduct&name=" + name + "&price=" + price + "&detail=" + detail + "&remain=" + remain);
-
+  <script>
+    const productApp = Vue.createApp({
+      data() {
+        return {
+          UI: 'main',
+          dat: [],
+          newProduct: {
+            id: -1,
+            name: '',
+            price: '',
+            detail: '',
+            remain: ''
+          }
         }
-    </script>
-</body>    
+      },
+      methods: {
+        loadList: function () {
+          const that = this;
+          fetch('controller.php?act=listProduct')
+            .then(function (response) {
+              return response.json();
+            })
+            .then(function (myJson) {
+              that.dat = myJson;
+            });
+        },
+        del: function (id) {
+          const that = this;
+          let url = "controller.php?act=del&id=" + id;
+          fetch(url, {
+            method: 'POST'
+          })
+            .then(function (res) { return res.text(); })
+            .then(function (data) {
+              console.log(data);
+              that.loadList();
+            })
+        },
+        addProduct: function () {
+          const that = this;
+          let mydat = new FormData();
+          mydat.append("dat", JSON.stringify(this.newProduct));
+
+          let url = "controller.php?act=addProduct";
+          fetch(url, {
+            method: 'POST',
+            body: mydat
+          })
+            .then(function (res) { return res.text(); })
+            .then(function (data) {
+              console.log(data);
+              that.setUI('main');
+              that.loadList();
+            })
+        },
+        setEditUI: function (product) {
+          this.newProduct = product;
+          this.setUI('editForm');
+        },
+        setAddUI: function () {
+          this.newProduct = {
+            id: -1,
+            name: '',
+            price: '',
+            detail: '',
+            remain: ''
+          };
+          this.setUI('editForm');
+        },
+        setUI: function (page) {
+          this.UI = page;
+        }
+      },
+      created() {
+        this.loadList();
+      }
+    }).mount("#main");
+  </script>
+</body>
 </html>
