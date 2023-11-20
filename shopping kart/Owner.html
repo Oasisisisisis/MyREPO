@@ -14,8 +14,8 @@
             <br/>
             商品說明: <textarea name='detail'></textarea><br/>
             <br/>
-            庫存: <input name="remain" type="number" min="0" value="0" /><br/> 
-            <br/>
+			庫存: <input name="remain" type="number" min="0" value="0" /><br/>
+			<br/> 
             <input type='button' value="save" onclick="saveProduct()">
             <hr>
             <div id="resultMessage"></div> 
@@ -25,8 +25,9 @@
     <script>
         function saveProduct() {
             var name = document.getElementsByName('name')[0].value;
-            var price = document.getElementsByName('price')[0].value;
-            var detail = document.getElementsByName('detail')[0].value;
+			var price = document.getElementsByName('price')[0].value;
+			var detail = document.getElementsByName('detail')[0].value;
+			var remain = document.getElementsByName('remain')[0].value;
 
             // 使用 AJAX 將商品資訊傳送到後端處理
             var xhr = new XMLHttpRequest();
@@ -41,9 +42,10 @@
                     document.getElementsByName('detail')[0].value = '';
                 }
             };
-            xhr.open("POST", "controller.php", true);
-            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            xhr.send("action=addProduct&name=" + name + "&price=" + price + "&detail=" + detail);
+			xhr.open("POST", "controller.php", true);
+			xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			xhr.send("action=addProduct&name=" + name + "&price=" + price + "&detail=" + detail + "&remain=" + remain);
+
         }
     </script>
 </body>    
