@@ -3,6 +3,26 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="stylesheet" href="style.css" >
   <script>
+  function loadURL(URL) {
+	//向URL發出request
+	fetch(URL,{
+		method: 'POST', // or 'GET'
+	})
+	.then(function(res){ //fetch的callback function，傳回值是promise物件: res
+		//將res的內容轉為文字，傳給下一個Callback function
+		return res.text();
+	})
+	.then(function(data){ //下一個callback function，參數data是上一個callback傳進來的文字
+		
+		//找到要顯示內容的div
+		let div = document.getElementById('main');
+		//將傳進來的文字放進div中
+		div.innerHTML=data;
+	})
+
+
+
+}
     let cart = []; // 儲存購物車內容的陣列
 
 function openModal() {
@@ -72,92 +92,7 @@ addToCart(item2);
       </div>
     </div>
 
-    <div class="container">
-        <section>
-            <article>
-              
-                <img src="C:\xampp\htdocs\online shop site\img\pig.jpg" alt="Description of the image">
-                <h2>First product</h2>
-                <h3>NT $250</h3>
-                <button>inspect information</button>
-                <button>Add to cart</button>
-              <p></p>
-              
-            </article>
-      
-            <article>
-              
-              <img src="C:\xampp\htdocs\online shop site\img\pig.jpg" alt="Description of the image">
-                <h2>second product</h2>
-                <h3>NT $250</h3>
-                <button>inspect information</button>
-                <button>Add to cart</button>
-              <p></p>
-            </article>
-      
-            <article>
-                <img src="C:\xampp\htdocs\online shop site\img\pig.jpg" alt="Description of the image">
-                <h2>third product</h2>
-                <h3>NT $250</h3>
-                <button>inspect information</button>
-                <button>Add to cart</button>
-      
-              <p></p>
-      
-              
-            </article>
-            <article>
-                <img src="C:\xampp\htdocs\online shop site\img\pig.jpg" alt="Description of the image">
-                <h2>forth product</h2>
-                <h3>NT $250</h3>
-                <button>inspect information</button>
-                <button>Add to cart</button>
-                
-                <p></p>
-              </article>
-          </section>
-          <section>
-            <article>
-              
-                <img src="C:\xampp\htdocs\online shop site\img\pig.jpg" alt="Description of the image">
-                <h2>First product</h2>
-                <h3>NT $250</h3>
-                <button>inspect information</button>
-                <button>Add to cart</button>
-              <p></p>
-              
-            </article>
-      
-            <article>
-              
-              <img src="C:\xampp\htdocs\online shop site\img\pig.jpg" alt="Description of the image">
-                <h2>second product</h2>
-                <h3>NT $250</h3>
-                <button>inspect information</button>
-                <button>Add to cart</button>
-              <p></p>
-            </article>
-      
-            <article>
-                <img src="C:\xampp\htdocs\online shop site\img\pig.jpg" alt="Description of the image">
-                <h2>third product</h2>
-                <h3>NT $250</h3>
-                <button>inspect information</button>
-                <button>Add to cart</button>
-      
-              <p></p>
-      
-              
-            </article>
-            <article>
-                <img src="C:\xampp\htdocs\online shop site\img\pig.jpg" alt="Description of the image">
-                <h2>forth product</h2>
-                <h3>NT $250</h3>
-                <button>inspect information</button>
-                <button>Add to cart</button>
-                
-                <p></p>
-              </article>
-          </section>
-    </div>
+    <button onclick="loadURL('ProductList.php')"> Load Products</button>
+
+</body>   
 </html>
