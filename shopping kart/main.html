@@ -3,7 +3,52 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="stylesheet" href="style.css" >
   <script type="text/javascript" src="https://unpkg.com/vue@next"></script>
+  <body>
+    <header>
+      <h1>ONLINE SHOP SITE--THE FIRST GROUP</h1>
+  </header>
+  
+  <button onclick="openModal()">查看購物車</button>
+  <!-- 購物車模態框 -->
+  <div id="cartModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>購物車內容</h2>
+        <div id="cartItems"></div>
+        <p id="totalPrice">總價: $0</p>
+    </div>
+  </div>
+
+
+
+
+    <div id="main"> <!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
+      <div id="list" v-if="UI=='main'"><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
+          <table border=1><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
+              <tr>
+                <td>序號</td>
+                <td>商品名稱</td>
+                <td>價格</td>
+                <td>內容說明</td>
+                <td>存貨數量</td>
+              </tr>
+              <tr v-for="product in dat">
+                <td>{{product.id}}</td>
+                <td>{{product.name}}</td>
+                <td>{{product.price}}</td>
+                <td>{{product.detail}}</td>
+                <td>{{product.remain}}</td>
+              </tr>
+            </table>
+      </div>
+
+  </div>
+
+
+  
+  </body>
   <script>
+    
 
     const productApp = Vue.createApp({
       data() {
@@ -27,10 +72,12 @@
               return response.json();
             })
             .then(function (myJson) {
+              console.log(myJson); // 檢查資料是否正確
               that.dat = myJson;
             });
-        }
         },
+
+      },
       created() {
         this.loadList();
       }
@@ -39,7 +86,7 @@
 
 
 
-    let cart = []; // 儲存購物車內容的陣列
+   let cart = []; // 儲存購物車內容的陣列
 
 function openModal() {
     updateCart(); // 更新購物車內容
@@ -65,7 +112,7 @@ function updateCart() {
     const totalPriceElement = document.getElementById('totalPrice');
 
     // 清空購物車內容
-    cartItemsElement.innerHTML = '';
+    // cartItemsElement.innerHTML = '';
 
     // 更新購物車內容
     cart.forEach((item, index) => {
@@ -92,44 +139,5 @@ addToCart(item2);
 
   </script>
 </head>
-<body>
-    <header>
-        <h1>ONLINE SHOP SITE--THE FIRST GROUP</h1>
-    </header>
-    
-    <button onclick="openModal()">查看購物車</button>
-    <!-- 購物車模態框 -->
-    <div id="cartModal" class="modal">
-      <div class="modal-content">
-          <span class="close" onclick="closeModal()">&times;</span>
-          <h2>購物車內容</h2>
-          <div id="cartItems"></div>
-          <p id="totalPrice">總價: $0</p>
-      </div>
-    </div>
-
-
-    <div id="main">
-        <div id="list" v-if="UI=='main'">
-            <table border=1>
-                <tr>
-                  <td>序號</td>
-                  <td>商品名稱</td>
-                  <td>價格</td>
-                  <td>內容說明</td>
-                  <td>存貨數量</td>
-                </tr>
-                <tr v-for="product in dat">
-                  <td>{{product.id}}</td>
-                  <td>{{product.name}}</td>
-                  <td>{{product.price}}</td>
-                  <td>{{product.detail}}</td>
-                  <td>{{product.remain}}</td>
-                </tr>
-              </table>
-        </div>
-
-    </div>
-
-</body>   
+  
 </html>
