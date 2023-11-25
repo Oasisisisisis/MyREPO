@@ -3,52 +3,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="stylesheet" href="style.css" >
   <script type="text/javascript" src="https://unpkg.com/vue@next"></script>
-  <body>
-    <header>
-      <h1>ONLINE SHOP SITE--THE FIRST GROUP</h1>
-  </header>
-  
-  <button onclick="openModal()">查看購物車</button>
-  <!-- 購物車模態框 -->
-  <div id="cartModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h2>購物車內容</h2>
-        <div id="cartItems"></div>
-        <p id="totalPrice">總價: $0</p>
-    </div>
-  </div>
-
-
-
-
-    <div id="main"> <!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
-      <div id="list" v-if="UI=='main'"><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
-          <table border=1><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
-              <tr>
-                <td>序號</td>
-                <td>商品名稱</td>
-                <td>價格</td>
-                <td>內容說明</td>
-                <td>存貨數量</td>
-              </tr>
-              <tr v-for="product in dat">
-                <td>{{product.id}}</td>
-                <td>{{product.name}}</td>
-                <td>{{product.price}}</td>
-                <td>{{product.detail}}</td>
-                <td>{{product.remain}}</td>
-              </tr>
-            </table>
-      </div>
-
-  </div>
-
-
-  
-  </body>
   <script>
-    
 
     const productApp = Vue.createApp({
       data() {
@@ -72,33 +27,42 @@
               return response.json();
             })
             .then(function (myJson) {
-              console.log(myJson); // 檢查資料是否正確
               that.dat = myJson;
             });
+        }
         },
-
-      },
       created() {
         this.loadList();
+        this.openModal();      //(((((((((((需要在加
       }
     }).mount("#main");
 
 
 
 
-   let cart = []; // 儲存購物車內容的陣列
+    let cart = []; // 儲存購物車內容的陣列
 
 function openModal() {
     updateCart(); // 更新購物車內容
     document.getElementById('cartModal').style.display = 'block';
 }
 
+openModal();
+
 function closeModal() {
     document.getElementById('cartModal').style.display = 'none';
 }
 
-function addToCart(item) {
-    cart.push(item);
+function addToCart(product) {
+    // 檢查購物車中是否已經有這個商品
+    const existingProduct = cart.find(item => item.id === product.id);
+
+    if (existingProduct) {
+      existingProduct.quantity++;
+    } else {
+      cart.push({ ...product, quantity: 1 });
+    }
+    
     updateCart();
 }
 
@@ -108,36 +72,100 @@ function removeFromCart(index) {
 }
 
 function updateCart() {
-    const cartItemsElement = document.getElementById('cartItems');
+    const cartProductsElement = document.getElementById('cartProducts');
     const totalPriceElement = document.getElementById('totalPrice');
 
     // 清空購物車內容
-    // cartItemsElement.innerHTML = '';
+    cartProductsElement.innerHTML = '';
 
     // 更新購物車內容
-    cart.forEach((item, index) => {
-        const itemElement = document.createElement('div');
-        itemElement.innerHTML = `
-            <p>${item.name} - 單價: $${item.price} - 數量: 1
-            <button onclick="removeFromCart(${index})">移除</button></p>
+    cart.forEach((product, index) => {
+        const productElement = document.createElement('div');
+        productElement.innerHTML = `
+            <p>${product.name} - 單價: $${product.price} - 數量: ${product.quantity}</p>
+            
         `;
-        cartItemsElement.appendChild(itemElement);
+        cartProductsElement.appendChild(productElement);
     });
 
     // 計算總價
-    const totalPrice = cart.reduce((total, item) => total + item.price, 0);
+    const totalPrice = cart.reduce((total, product) => total + product.price * product.quantity, 0);
     totalPriceElement.textContent = `總價: $${totalPrice}`;
 }
 
 // 假設有兩個商品
-const item1 = { name: '商品1', price: 10 };
-const item2 = { name: '商品2', price: 20 };
+const product1 = { id: 1, name: '商品1', price: 10, quantity: 1 };
+const product2 = { id: 2, name: '商品2', price: 20, quantity: 1 };
 
 // 加入一些商品到購物車（根據實際情況調用 addToCart 函數）
-addToCart(item1);
-addToCart(item2);
+addToCart(product1);
+addToCart(product2);
 
   </script>
 </head>
+<body>
+  <header>
+      <h1>ONLINE SHOP SITE--THE FIRST GROUP</h1>
+  </header>
   
+  <button onclick="openModal()">查看購物車</button>
+  <!-- 購物車模態框 -->
+  <div id="cartModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>購物車內容</h2>
+        <table border="1">
+          <tr>
+              <th>商品名稱</th>
+              <th>單價</th>
+              <th>數量</th>
+              <th>操作</th>
+          </tr>
+          <tr v-for="(product, index) in cart">
+              <td>{{ product.name }}</td>
+              <td>{{ product.price }}</td>
+              <td>
+                <input type="number" v-model="product.quantity" min="1" @change="updateCart" />
+              </td>
+              <td>
+                  <button @click="removeFromCart(index)">delete</button>
+              </td>
+          </tr>
+      </table>
+        <div id="cartProducts"></div>
+        <p id="totalPrice">總價: $0</p>
+    </div>
+  </div>
+
+
+
+
+    <div id="main"> <!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
+      <div id="list" v-if="UI=='main'"><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
+          <table border=1><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
+              <tr>
+                <td>序號</td>
+                <td>商品名稱</td>
+                <td>價格</td>
+                <td>內容說明</td>
+                <td>存貨數量</td>
+              </tr>
+              <tr v-for="product in dat">
+                <td>{{product.id}}</td>
+                <td>{{product.name}}</td>
+                <td>{{product.price}}</td>
+                <td>{{product.detail}}</td>
+                <td>{{product.remain}}</td>
+                <td>
+                  <button @click="addToCart(product),updateCart()">加入購物車</button>
+                </td>
+              </tr>
+            </table>
+      </div>
+
+  </div>
+
+
+  
+  </body> 
 </html>
