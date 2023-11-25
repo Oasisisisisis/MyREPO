@@ -28,15 +28,17 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `product` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `price` int(11) NOT NULL,
   `remain` int(11) NOT NULL DEFAULT 0,
-  `detail` text NOT NULL
+  `detail` text NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+
 CREATE TABLE `cart` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `product_id` int(11) NOT NULL,
   `quantity` int(11) NOT NULL,
   PRIMARY KEY (`id`),
@@ -51,28 +53,12 @@ INSERT INTO `product` (`id`, `name`, `price`, `remain`, `detail`) VALUES
 (1, 'coffee', 420, 76, ''),
 (2, '1', 1, 1, '1');
 
--- 傾印資料表的資料 `cart`
---
+
 
 INSERT INTO `cart` (`id`, `product_id`, `quantity`) VALUES
 (1, 1, 2),  
 (2, 2, 1); 
 
---
--- 已傾印資料表的索引
---
-
---
--- 資料表索引 `product`
---
-ALTER TABLE `product`
-  ADD PRIMARY KEY (`id`);
-
---
--- 資料表索引 `cart`
---
-ALTER TABLE `cart`
-  ADD PRIMARY KEY (`id`);
 
 --
 -- 在傾印的資料表使用自動遞增(AUTO_INCREMENT)
