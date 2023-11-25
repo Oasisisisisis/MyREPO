@@ -3,8 +3,72 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="stylesheet" href="style.css" >
   <script type="text/javascript" src="https://unpkg.com/vue@next"></script>
-  <script>
+  
+</head>
+<body>
+  <header>
+      <h1>ONLINE SHOP SITE--THE FIRST GROUP</h1>
+  </header>
+  
+  <button onclick="openModal()">查看購物車</button>
 
+
+  <div id="main"> <!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
+    <div id="list" v-if="UI=='main'"><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
+        <table border=1><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
+            <tr>
+              <td>序號</td>
+              <td>商品名稱</td>
+              <td>價格</td>
+              <td>內容說明</td>
+              <td>存貨數量</td>
+            </tr>
+            <tr v-for="product in dat">
+              <td>{{product.id}}</td>
+              <td>{{product.name}}</td>
+              <td>{{product.price}}</td>
+              <td>{{product.detail}}</td>
+              <td>{{product.remain}}</td>
+              <td>
+                <button @click="addToCart(product),updateCart()">加入購物車</button>
+              </td>
+            </tr>
+          </table>
+      </div>
+  </div>
+
+
+
+
+  <!-- 購物車模態框 !-->
+  <div id="cartModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>購物車內容</h2>
+        <table border="1">
+          <tr>
+              <th>商品名稱</th>
+              <th>單價</th>
+              <th>數量</th>
+              <th>操作</th>
+          </tr>
+          <tr v-for="(product, index) in cart">
+              <td>{{ product.name }}</td>
+              <td>{{ product.price }}</td>
+              <td>
+                <input type="number" v-model="product.quantity" min="1" @change="updateCart" />
+              </td>
+              <td>
+                  <button @click="removeFromCart(index)">delete</button>
+              </td>
+          </tr>
+      </table>
+        <div id="cartProducts"></div>
+        <p id="totalPrice">總價: $0</p>
+    </div>
+  </div>
+
+  <script>
     const productApp = Vue.createApp({
       data() {
         return {
@@ -102,70 +166,5 @@ addToCart(product1);
 addToCart(product2);
 
   </script>
-</head>
-<body>
-  <header>
-      <h1>ONLINE SHOP SITE--THE FIRST GROUP</h1>
-  </header>
-  
-  <button onclick="openModal()">查看購物車</button>
-  <!-- 購物車模態框 -->
-  <div id="cartModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h2>購物車內容</h2>
-        <table border="1">
-          <tr>
-              <th>商品名稱</th>
-              <th>單價</th>
-              <th>數量</th>
-              <th>操作</th>
-          </tr>
-          <tr v-for="(product, index) in cart">
-              <td>{{ product.name }}</td>
-              <td>{{ product.price }}</td>
-              <td>
-                <input type="number" v-model="product.quantity" min="1" @change="updateCart" />
-              </td>
-              <td>
-                  <button @click="removeFromCart(index)">delete</button>
-              </td>
-          </tr>
-      </table>
-        <div id="cartProducts"></div>
-        <p id="totalPrice">總價: $0</p>
-    </div>
-  </div>
-
-
-
-
-    <div id="main"> <!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
-      <div id="list" v-if="UI=='main'"><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
-          <table border=1><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
-              <tr>
-                <td>序號</td>
-                <td>商品名稱</td>
-                <td>價格</td>
-                <td>內容說明</td>
-                <td>存貨數量</td>
-              </tr>
-              <tr v-for="product in dat">
-                <td>{{product.id}}</td>
-                <td>{{product.name}}</td>
-                <td>{{product.price}}</td>
-                <td>{{product.detail}}</td>
-                <td>{{product.remain}}</td>
-                <td>
-                  <button @click="addToCart(product),updateCart()">加入購物車</button>
-                </td>
-              </tr>
-            </table>
-      </div>
-
-  </div>
-
-
-  
-  </body> 
+</body> 
 </html>
