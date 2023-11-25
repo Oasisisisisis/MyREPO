@@ -35,6 +35,14 @@ CREATE TABLE `product` (
   `detail` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+CREATE TABLE `cart` (
+  `id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`product_id`) REFERENCES `product`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 --
 -- 傾印資料表的資料 `product`
 --
@@ -42,6 +50,13 @@ CREATE TABLE `product` (
 INSERT INTO `product` (`id`, `name`, `price`, `remain`, `detail`) VALUES
 (1, 'coffee', 420, 76, ''),
 (2, '1', 1, 1, '1');
+
+-- 傾印資料表的資料 `cart`
+--
+
+INSERT INTO `cart` (`id`, `product_id`, `quantity`) VALUES
+(1, 1, 2),  
+(2, 2, 1); 
 
 --
 -- 已傾印資料表的索引
@@ -54,6 +69,12 @@ ALTER TABLE `product`
   ADD PRIMARY KEY (`id`);
 
 --
+-- 資料表索引 `cart`
+--
+ALTER TABLE `cart`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- 在傾印的資料表使用自動遞增(AUTO_INCREMENT)
 --
 
@@ -63,6 +84,12 @@ ALTER TABLE `product`
 ALTER TABLE `product`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
+
+--
+-- 使用資料表自動遞增(AUTO_INCREMENT) `cart`
+--
+ALTER TABLE `cart`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
