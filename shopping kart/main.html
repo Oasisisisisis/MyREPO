@@ -35,38 +35,12 @@
             </tr>
           </table>
       </div>
+
+
+      
   </div>
 
 
-
-
-  <!-- 購物車模態框 !-->
-  <div id="cartModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h2>購物車內容</h2>
-        <table border="1">
-          <tr>
-              <th>商品名稱</th>
-              <th>單價</th>
-              <th>數量</th>
-              <th>操作</th>
-          </tr>
-          <tr v-for="(product, index) in cart">
-              <td>{{ product.name }}</td>
-              <td>{{ product.price }}</td>
-              <td>
-                <input type="number" v-model="product.quantity" min="1" @change="updateCart" />
-              </td>
-              <td>
-                  <button @click="removeFromCart(index)">delete</button>
-              </td>
-          </tr>
-      </table>
-        <div id="cartProducts"></div>
-        <p id="totalPrice">總價: $0</p>
-    </div>
-  </div>
 
   <script>
     const productApp = Vue.createApp({
@@ -100,70 +74,6 @@
         this.openModal();      //(((((((((((需要在加
       }
     }).mount("#main");
-
-
-
-
-    let cart = []; // 儲存購物車內容的陣列
-
-function openModal() {
-    updateCart(); // 更新購物車內容
-    document.getElementById('cartModal').style.display = 'block';
-}
-
-openModal();
-
-function closeModal() {
-    document.getElementById('cartModal').style.display = 'none';
-}
-
-function addToCart(product) {
-    // 檢查購物車中是否已經有這個商品
-    const existingProduct = cart.find(item => item.id === product.id);
-
-    if (existingProduct) {
-      existingProduct.quantity++;
-    } else {
-      cart.push({ ...product, quantity: 1 });
-    }
-    
-    updateCart();
-}
-
-function removeFromCart(index) {
-    cart.splice(index, 1);
-    updateCart();
-}
-
-function updateCart() {
-    const cartProductsElement = document.getElementById('cartProducts');
-    const totalPriceElement = document.getElementById('totalPrice');
-
-    // 清空購物車內容
-    cartProductsElement.innerHTML = '';
-
-    // 更新購物車內容
-    cart.forEach((product, index) => {
-        const productElement = document.createElement('div');
-        productElement.innerHTML = `
-            <p>${product.name} - 單價: $${product.price} - 數量: ${product.quantity}</p>
-            
-        `;
-        cartProductsElement.appendChild(productElement);
-    });
-
-    // 計算總價
-    const totalPrice = cart.reduce((total, product) => total + product.price * product.quantity, 0);
-    totalPriceElement.textContent = `總價: $${totalPrice}`;
-}
-
-// 假設有兩個商品
-const product1 = { id: 1, name: '商品1', price: 10, quantity: 1 };
-const product2 = { id: 2, name: '商品2', price: 20, quantity: 1 };
-
-// 加入一些商品到購物車（根據實際情況調用 addToCart 函數）
-addToCart(product1);
-addToCart(product2);
 
   </script>
 </body> 
