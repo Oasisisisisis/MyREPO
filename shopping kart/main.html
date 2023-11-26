@@ -40,7 +40,7 @@
               <p>{{ prod.name }} - 單價: ${{ prod.price }} - 數量: {{ prod.quantity }}</p>
             </div>
           </div>
-          <div id="total-price">{{ totalPrice }}</div>
+          <div id="total-price">總價: {{ totalPrice }}</div>
       </div>
     </div>
 
@@ -128,7 +128,7 @@
           this.cart.splice(index, 1);
           this.updateCartPrice()
         }
-        },
+        }        ,
       created() {
         this.loadList();
       }
