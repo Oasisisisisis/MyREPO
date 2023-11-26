@@ -71,7 +71,6 @@ aside {
 
 /* 以下為購物車 */
 .modal {
-  display: none;
   position: fixed;
   top: 0;
   left: 0;

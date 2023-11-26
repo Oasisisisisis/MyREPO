@@ -10,10 +10,40 @@
       <h1>ONLINE SHOP SITE--THE FIRST GROUP</h1>
   </header>
   
-  <button onclick="openModal()">查看購物車</button>
-
-
   <div id="main"> <!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
+    <button @click="openModal()">查看購物車</button>
+
+    <div class="modal" v-if="isCartOpen">
+      <div class="modal-content">
+          <span class="close" @click="closeModal()">&times;</span>
+          <h2>購物車內容</h2>
+          <table border="1">
+            <tr>
+                <th>商品名稱</th>
+                <th>單價</th>
+                <th>數量</th>
+                <th>操作</th>
+            </tr>
+            <tr v-for="(product, index) in cart">
+                <td>{{ product.name }}</td>
+                <td>{{ product.price }}</td>
+                <td>
+                  <input type="number" v-model="product.quantity" min="1" @change="updateCartPrice" />
+                </td>
+                <td>
+                    <button @click="removeFromCart(index)">delete</button>
+                </td>
+            </tr>
+        </table>
+          <div>
+            <div v-for="prod in cart">
+              <p>{{ prod.name }} - 單價: ${{ prod.price }} - 數量: {{ prod.quantity }}</p>
+            </div>
+          </div>
+          <div id="total-price">{{ totalPrice }}</div>
+      </div>
+    </div>
+
     <div id="list" v-if="UI=='main'"><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
         <table border=1><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
             <tr>
@@ -30,7 +60,7 @@
               <td>{{product.detail}}</td>
               <td>{{product.remain}}</td>
               <td>
-                <button @click="addToCart(product),updateCart()">加入購物車</button>
+                <button @click="addToCart(product)">加入購物車</button>
               </td>
             </tr>
           </table>
@@ -54,7 +84,11 @@
             price: '',
             detail: '',
             remain: ''
-          }
+          },
+          // cart control relate
+          isCartOpen: false,
+          cart : [],
+          totalPrice: 0,
         }
       },
       methods: {
@@ -67,11 +101,36 @@
             .then(function (myJson) {
               that.dat = myJson;
             });
+        },
+        openModal: function() {
+          this.isCartOpen = true
+        },
+        closeModal: function() {
+          this.isCartOpen = false
+        },
+        updateCartPrice: function(){
+          let total = 0;
+          this.cart.forEach(item => {
+            total = total+ item.price * item.quantity
+        });
+          this.totalPrice = total;
+        },
+        addToCart: function(product){
+          const existingProduct = this.cart.find( item => item.id === product.id )
+          if (existingProduct) {
+            existingProduct.quantity++;
+          }else {
+            this.cart.push({...product, quantity:1});
+          }
+          this.updateCartPrice()
+        },
+        removeFromCart: function(index) {
+          this.cart.splice(index, 1);
+          this.updateCartPrice()
         }
         },
       created() {
         this.loadList();
-        this.openModal();      //(((((((((((需要在加
       }
     }).mount("#main");
 
