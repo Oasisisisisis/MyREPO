@@ -47,4 +47,54 @@ function delProduct($id)
     mysqli_stmt_execute($stmt);
     return true;
 }
+
+function addToCart($product_id, $quantity)
+{
+    global $db;
+    
+    $sql = "select * from cart where product_id=?";
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if(mysqli_num_rows($result) == 0 ) {
+        $sql = "insert into cart (product_id, quantity) value (?,?)";
+		$stmt = mysqli_prepare($db, $sql);
+        mysqli_stmt_bind_param($stmt, "ii", $product_id, $quantity);
+        mysqli_stmt_execute($stmt);
+    }else{
+        $sql = "update cart set quantity=? where product_id=?";
+        $stmt = mysqli_prepare($db, $sql);
+        mysqli_stmt_bind_param($stmt, "ii", $quantity, $product_id);
+        mysqli_stmt_execute($stmt);
+
+    }
+    return true;
+}
+
+function removeFromCart($id)
+{
+    global $db;
+    $sql = "delete from cart where id=?";
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $id);
+    mysqli_stmt_execute($stmt);
+    return true;
+}
+
+function getCartList()
+{
+    global $db;
+    $sql = "select cart.id, product.name, product.price, cart.quantity from cart LEFT JOIN product ON product.id=cart.product_id";
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    $rows = array();
+    while ($r = mysqli_fetch_assoc($result)) {
+        $rows[] = $r;
+    }
+    return $rows;
+}
 ?>

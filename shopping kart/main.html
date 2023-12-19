@@ -31,7 +31,7 @@
                   <input type="number" v-model="product.quantity" min="1" @change="updateCartPrice" />
                 </td>
                 <td>
-                    <button @click="removeFromCart(index)">delete</button>
+                    <button @click="removeFromCart(product.id)">delete</button>
                 </td>
             </tr>
         </table>
@@ -60,7 +60,7 @@
               <td>{{product.detail}}</td>
               <td>{{product.remain}}</td>
               <td>
-                <button @click="addToCart(product)">加入購物車</button>
+                <button @click="addToCart(product.id)">加入購物車</button>
               </td>
             </tr>
           </table>
@@ -102,7 +102,19 @@
               that.dat = myJson;
             });
         },
+        loadCart: function () {
+          const that = this;
+          fetch('controller.php?act=listCart')
+            .then(function (response) {
+              return response.json();
+            })
+            .then(function (myJson) {
+              that.cart = myJson;
+              that.updateCartPrice()
+            });
+        },
         openModal: function() {
+          this.loadCart()
           this.isCartOpen = true
         },
         closeModal: function() {
@@ -115,20 +127,53 @@
         });
           this.totalPrice = total;
         },
-        addToCart: function(product){
-          const existingProduct = this.cart.find( item => item.id === product.id )
-          if (existingProduct) {
-            existingProduct.quantity++;
-          }else {
-            this.cart.push({...product, quantity:1});
-          }
-          this.updateCartPrice()
+        addToCart: function(productId){
+          const that = this;
+
+          const q = function(){
+            const temp = that.cart.find((v) => v.product_id === productId)
+
+            if (temp == undefined) {
+              return 1;
+            }
+
+            return temp.quantity + 1;
+          }()
+
+          let url = "controller.php?act=addToCart";
+
+          const dat =  new FormData();
+          dat.append("dat", JSON.stringify({
+                product_id: productId,
+                quantity:q
+              }))
+
+          fetch( url, {
+            method: 'POST',
+            body: dat
+          })
+            .then(function (res) { return res.text(); })
+            .then(function (data) {
+              console.log(data);
+              that.loadCart();
+            })
         },
-        removeFromCart: function(index) {
-          this.cart.splice(index, 1);
-          this.updateCartPrice()
+        removeFromCart: function(id) {
+          const that = this;
+          let url = "controller.php?act=removeFromCart&id=" + id;
+          fetch(url, {
+            method: 'POST'
+          })
+            .then(function (res) { return res.text(); })
+            .then(function (data) {
+              console.log(data);
+              that.loadCart();
+            })
+        },
+        setUI: function (page) {
+          this.UI = page;
         }
-        }        ,
+        }  ,
       created() {
         this.loadList();
       }
