@@ -27,9 +27,7 @@
             <tr v-for="(product, index) in cart">
                 <td>{{ product.name }}</td>
                 <td>{{ product.price }}</td>
-                <td>
-                  <input type="number" v-model="product.quantity" min="1" @change="updateCartPrice" />
-                </td>
+                <td>{{ product.quantity }}</td>
                 <td>
                     <button @click="removeFromCart(product.id)">delete</button>
                 </td>
@@ -127,37 +125,25 @@
         });
           this.totalPrice = total;
         },
-        addToCart: function(productId){
-          const that = this;
+		
+	addToCart: function(productId) {
+    const that = this;
+    let url = "controller.php?act=addToCart&productId=" + productId;
 
-          const q = function(){
-            const temp = that.cart.find((v) => v.product_id === productId)
-
-            if (temp == undefined) {
-              return 1;
+    fetch(url)
+		.then(function(res) {
+            return res.json(); 
+        })
+        .then(function(data) {
+            console.log(data);
+            if (data.error) {
+                alert(data.error);
+            } else {
+                that.loadCart();
             }
+        });
+},
 
-            return temp.quantity + 1;
-          }()
-
-          let url = "controller.php?act=addToCart";
-
-          const dat =  new FormData();
-          dat.append("dat", JSON.stringify({
-                product_id: productId,
-                quantity:q
-              }))
-
-          fetch( url, {
-            method: 'POST',
-            body: dat
-          })
-            .then(function (res) { return res.text(); })
-            .then(function (data) {
-              console.log(data);
-              that.loadCart();
-            })
-        },
         removeFromCart: function(id) {
           const that = this;
           let url = "controller.php?act=removeFromCart&id=" + id;
