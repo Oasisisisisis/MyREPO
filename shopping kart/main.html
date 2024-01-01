@@ -8,11 +8,10 @@
 <body>
   <header>
       <h1>ONLINE SHOP SITE--THE FIRST GROUP</h1>
+	  
   </header>
   
   <div id="main"> <!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
-    <button @click="openModal()">查看購物車</button>
-
     <div class="modal" v-if="isCartOpen">
       <div class="modal-content">
           <span class="close" @click="closeModal()">&times;</span>
@@ -43,7 +42,8 @@
     </div>
 
     <div id="list" v-if="UI=='main'"><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
-        <table border=1><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
+        <button @click="openModal()">查看購物車</button>
+		<table border=1><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
             <tr>
               <td>序號</td>
               <td>商品名稱</td>
@@ -62,35 +62,139 @@
               </td>
             </tr>
           </table>
-      </div>
+		  <input type='button' @click="logout()" value="logout"/>
+    </div>
+	
+	
+	<div id="list" v-if="UI=='owner'">
+      <header><h1>Owner</h1></header>
+	  </br>
+      <button @click="setAddUI()">Load Add Form</button>
+	  </br>
+	  </br>
+      <table border=1>
+        <tr>
+          <td>序號</td>
+          <td>商品名稱</td>
+          <td>價格</td>
+          <td>內容說明</td>
+          <td>存貨數量</td>
+          <td>-</td>
+        </tr>
+        <tr v-for="product in dat">
+          <td>{{product.id}}</td>
+          <td>{{product.name}}</td>
+          <td>{{product.price}}</td>
+          <td>{{product.detail}}</td>
+          <td>{{product.remain}}</td>
+          <td>
+            <button @click="del(product.id)">刪</button><button @click="setEditUI(product)">改</button>
+          </td>
+        </tr>
+      </table>
+	  <input type='button' @click="logout()" value="logout"/>
+    </div>
+	
+	<div v-if="UI=='editForm'">
+	  </br>
+	  商品名稱: <input type="text" v-model="newProduct.name" /> <br />
+	  價錢: <input type="text" v-model="newProduct.price" /> <br />
+	  商品說明: <textarea v-model="newProduct.detail"></textarea><br />
+	  庫存: <input type="number" v-model="newProduct.remain"><br />
+	  <input type='button' @click="addProduct(newProduct)" value="save">
+	</div>
 
+	
+	
+	 <div v-if="UI=='loginForm'">
+		</br>
+		ID: <input type="text"  v-model="id"/> <br/>
+		Password: <input type="text" v-model="pwd" />
+		<input type='button' @click="login()" value="login"/> <br/>
+		<button @click="showRegistrationForm()">註冊</button>
+	 </div>
+	 
+	 <div v-if="UI=='registrationForm'">
+		<h2>註冊</h2>
+		<input type='button' @click="setUI('loginForm')" value="返回"><br />
+		ID: <input type="text" v-model="registration.id" /> <br />
+		Password: <input type="password" v-model="registration.pwd" /> <br />
+		身分: 
+		<select v-model="registration.role">
+			<option value="1">使用者</option>
+			<option value="99">Owner</option>
+		</select> <br />
+		<input type='button' @click="register()" value="註冊">
+	</div>
 
-      
   </div>
 
 
 
   <script>
     const productApp = Vue.createApp({
-      data() {
-        return {
-          UI: 'main',
-          dat: [],
-          newProduct: {
-            id: -1,
-            name: '',
-            price: '',
-            detail: '',
-            remain: ''
-          },
-          // cart control relate
-          isCartOpen: false,
-          cart : [],
-          totalPrice: 0,
-        }
-      },
+	data() {
+	  return {
+		UI: 'main',
+		dat: [],
+		isCartOpen: false,
+		cart : [],
+		totalPrice: 0,
+		userId: null,
+		myRole: 0 //來存註冊者的角色
+		
+	  }
+	},
+
       methods: {
-        loadList: function () {
+		checkLogin: function() {
+		  if (this.myRole === 1) { //1是客戶
+			this.setUI('main');
+			this.loadAllList();
+		  } else if (this.myRole === 99) { //99是商家
+			this.setUI('owner');
+			this.loadUserList();
+		  } else {
+			this.setUI('loginForm'); //還沒登入的話顯示登入畫面
+ 		  }
+		},
+		login: function() { //登入後與後台確認是否正確
+		  const that = this;
+		  let mydat = new FormData();
+		  mydat.append("id", this.id);
+		  mydat.append("pwd", this.pwd);
+		  mydat.append("act", 'login');
+		  let url = "controller.php";
+		  fetch(url, {
+			method: 'POST',
+			body: mydat
+		  })
+		  .then(function(res) {
+			return res.json();
+		  })
+		  .then(function(data) {
+			console.log(data);
+			if (data.role > 0) {
+			  that.userId = data.id; //將id存起來 以便後面判斷對應其項目
+			  that.myRole = data.role;
+			  that.checkLogin();
+			} else {
+			  alert("登入失敗");
+			}
+		  });
+		},
+		logout: function() {
+		  const that=this;
+		  let url="controller.php?act=logout";
+		  fetch(url)
+		  .then(function(res){return res.text(); }) 
+		  .then(function(data){
+			that.userId = null;  //登出把資料都清掉
+			that.myRole = 0;
+			that.checkLogin();
+		  })
+		},
+        loadAllList: function () { //在客戶頁面列出所有商品內容
           const that = this;
           fetch('controller.php?act=listProduct')
             .then(function (response) {
@@ -100,9 +204,20 @@
               that.dat = myJson;
             });
         },
+		loadUserList: function () { //在商家頁面只列出自己的商品
+			const that = this; 
+			fetch('controller.php?act=listUserProduct&userId=' + this.userId) //把id傳到後台 讓model判斷 只回傳同id的商品
+				.then(function (response) {
+					return response.json();
+				})
+				.then(function (myJson) {
+					that.dat = myJson;
+				});
+		},
         loadCart: function () {
           const that = this;
-          fetch('controller.php?act=listCart')
+		  let url="controller.php?act=listCart&userId="+ this.userId;
+          fetch(url)
             .then(function (response) {
               return response.json();
             })
@@ -124,26 +239,23 @@
             total = total+ item.price * item.quantity
         });
           this.totalPrice = total;
-        },
-		
-	addToCart: function(productId) {
-    const that = this;
-    let url = "controller.php?act=addToCart&productId=" + productId;
-
-    fetch(url)
-		.then(function(res) {
-            return res.json(); 
-        })
-        .then(function(data) {
-            console.log(data);
-            if (data.error) {
-                alert(data.error);
-            } else {
-                that.loadCart();
-            }
-        });
-},
-
+        },		
+		addToCart: function(productId) {
+		  const that = this;
+		  let url = "controller.php?act=addToCart&productId=" + productId + "&userId=" + this.userId; //把id傳到後台 一起加到新增的資料
+		  fetch(url)
+			.then(function(res) {
+			  return res.json(); 
+			})
+			.then(function(data) {
+			  console.log(data);
+			  if (data.error) {
+				alert(data.error);
+			  } else {
+				that.loadCart();
+			  }
+			});
+		},
         removeFromCart: function(id) {
           const that = this;
           let url = "controller.php?act=removeFromCart&id=" + id;
@@ -156,12 +268,88 @@
               that.loadCart();
             })
         },
+		del: function (id) {
+          const that = this;
+          let url = "controller.php?act=del&id=" + id;
+          fetch(url, {
+            method: 'POST'
+          })
+            .then(function (res) { return res.text(); })
+            .then(function (data) {
+              console.log(data);
+              that.loadUserList();
+            })
+        },
+		addProduct: function () {
+		  const that = this;
+		  this.newProduct.userId = this.userId;
+		  let mydat = new FormData();
+		  mydat.append("dat", JSON.stringify(this.newProduct));
+
+		  let url = "controller.php?act=addProduct";
+		  fetch(url, {
+			method: 'POST',
+			body: mydat
+		  })
+		  .then(function (res) { return res.text(); })
+		  .then(function (data) {
+			console.log(data);
+			that.setUI('owner');
+			that.loadUserList();
+		  })
+		},
+        setEditUI: function (product) {
+          this.newProduct = product;
+          this.setUI('editForm');
+        },
+        setAddUI: function () {
+          this.newProduct = {
+            id: -1,
+            name: '',
+            price: '',
+            detail: '',
+            remain: ''
+          };
+          this.setUI('editForm');
+        },
+		showRegistrationForm: function() {
+			this.registration = {
+				id: '',
+				pwd: '',
+				role: 1
+			 };
+			this.setUI('registrationForm');
+		},
+		register: function() {
+			const that = this;
+			let mydat = new FormData();
+			mydat.append("id", this.registration.id);
+			mydat.append("pwd", this.registration.pwd);
+			mydat.append("role", this.registration.role);
+			mydat.append("act", 'register'); 
+			let url = "controller.php";
+			fetch(url, {
+				method: 'POST',
+				body: mydat
+			})
+			.then(function(res) {
+				return res.json();
+			})
+			.then(function(data) {
+				console.log(data);
+				if (data.msg === 'OK') {
+					that.setUI('loginForm');
+				} else {
+					alert("註冊失敗");
+				}
+			});
+		},
         setUI: function (page) {
           this.UI = page;
         }
         }  ,
       created() {
-        this.loadList();
+		this.checkLogin();
       }
     }).mount("#main");
 

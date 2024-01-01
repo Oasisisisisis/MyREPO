@@ -11,34 +11,85 @@ switch ($act) {
             echo json_encode($products);
         }
         return;
+	case "listUserProduct":
+		$user_id = $_REQUEST['userId']; 
+		$products = getUserProductList($user_id); 
+		if ($products === false) {
+			echo "Error fetching product list.";
+		} else {
+			echo json_encode($products);
+		}
+		return;
     case "addProduct":
         $jsonStr = $_POST['dat'];
         $product = json_decode($jsonStr);
-        // 需要進行驗證
-        addProduct($product->name, $product->price, $product->detail, $product->remain, $product->id);
+        addProduct($product->name, $product->price, $product->detail, $product->remain, $product->id, $product->userId);
         return;
     case "del":
         $id = (int)$_REQUEST['id'];
-        // 驗證
         delProduct($id);
         return;
 	case "addToCart":
-	  $productId = (int)$_REQUEST['productId'];
-	  addToCart($productId);
-	  return;
+		$productId = (int)$_REQUEST['productId'];
+		$userId = $_REQUEST['userId'];
+		addToCart($productId, $userId); 
+		return;
     case "removeFromCart":
         $id = (int)$_REQUEST['id'];
-        // 驗證
         removeFromCart($id);
         return;
     case "listCart":
-        $products = getCartList();
-        if ($products === false) {
-            echo "Error fetching cart list.";
-        } else {
-                echo json_encode($products);
-            }
-            return;
+		$user_id = $_REQUEST['userId'];
+		$products = getCartList($user_id);
+		if ($products === false) {
+			echo "Error fetching cart list.";
+		} else {
+			echo json_encode($products);
+		}
+		return;
+
+	case "login":
+    $id = $_REQUEST['id'];
+    $pwd = $_REQUEST['pwd'];
+
+    $role = login($id, $pwd); 
+    if ($role > 0) {
+        $msg = [
+            "msg" => "OK",
+            "role" => $role,
+            "id" => $id 
+        ];
+    } else {
+        $msg = [
+            "msg" => "NO",
+            "role" => 0,
+            "id" => null 
+        ];
+    }
+
+    echo json_encode($msg);
+    return;
+    break;
+
+	case "logout":
+		setcookie('loginRole',0,httponly:true);
+		break;
+	case "register":
+		$id = $_POST['id'];
+		$pwd = $_POST['pwd'];
+		$role = $_POST['role'];
+
+		$result = register($id, $pwd, $role); 
+
+		if ($result) {
+			$msg = ["msg" => "OK"];
+		} else {
+			$msg = ["msg" => "Error"];
+		}
+
+		echo json_encode($msg);
+		return;
+
     default:
 }
 
