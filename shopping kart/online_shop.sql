@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2024-01-01 15:21:31
+-- 產生時間： 2024-01-02 06:59:10
 -- 伺服器版本： 10.4.24-MariaDB
 -- PHP 版本： 8.1.6
 
@@ -48,6 +48,29 @@ INSERT INTO `cart` (`id`, `product_id`, `quantity`, `user_id`) VALUES
 -- --------------------------------------------------------
 
 --
+-- 資料表結構 `order`
+--
+
+CREATE TABLE `order` (
+  `id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `client_id` varchar(10) NOT NULL,
+  `owner_id` varchar(10) NOT NULL,
+  `state` int(5) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- 傾印資料表的資料 `order`
+--
+
+INSERT INTO `order` (`id`, `product_id`, `quantity`, `client_id`, `owner_id`, `state`) VALUES
+(1, 15, 3, '2', '1', 2),
+(2, 16, 2, 'A', '1', 2);
+
+-- --------------------------------------------------------
+
+--
 -- 資料表結構 `product`
 --
 
@@ -69,7 +92,7 @@ INSERT INTO `product` (`id`, `name`, `price`, `remain`, `detail`, `user_id`) VAL
 (16, 'chocolate', 120, 22, 'goodgoodgood', '1'),
 (17, 'iphone', 50000, 11, 'iphone15', '123'),
 (18, 'happyNewYear', 2024, 28, 'hi', '123'),
-(21, 'pen', 10, 15, 'blue', '1');
+(21, 'pen', 10, 17, 'blue', '1');
 
 -- --------------------------------------------------------
 
@@ -91,6 +114,7 @@ INSERT INTO `user` (`id`, `pwd`, `role`) VALUES
 ('1', '1', 99),
 ('123', '123', 99),
 ('2', '2', 1),
+('3', '3', 50),
 ('A', '111', 1);
 
 --
@@ -103,6 +127,12 @@ INSERT INTO `user` (`id`, `pwd`, `role`) VALUES
 ALTER TABLE `cart`
   ADD PRIMARY KEY (`id`),
   ADD KEY `product_id` (`product_id`);
+
+--
+-- 資料表索引 `order`
+--
+ALTER TABLE `order`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- 資料表索引 `product`
@@ -127,10 +157,16 @@ ALTER TABLE `cart`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
 
 --
+-- 使用資料表自動遞增(AUTO_INCREMENT) `order`
+--
+ALTER TABLE `order`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- 使用資料表自動遞增(AUTO_INCREMENT) `product`
 --
 ALTER TABLE `product`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- 已傾印資料表的限制式

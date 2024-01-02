@@ -16,6 +16,21 @@ function getProductList()
     return $rows;
 }
 
+function getOrderList()
+{
+    global $db;
+    $sql = "SELECT id, client_id, owner_id, state FROM `order`;"; // 注意这里的``来转义order关键字
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    $rows = array();
+    while ($r = mysqli_fetch_assoc($result)) {
+        $rows[] = $r;
+    }
+    return $rows;
+}
+
 function getUserProductList($user_id)
 {
     global $db;

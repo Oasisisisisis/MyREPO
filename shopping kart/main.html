@@ -104,9 +104,24 @@
 	  <input type='button' @click="addProduct(newProduct)" value="save">
 	</div>
 
+	<div v-if="UI=='logistics'">
+	<h2>物流</h2>
+	<tr>
+          <td>序號</td>
+          <td>客戶</td>
+          <td>商家</td>
+          <td>狀態</td>
+          <td>-</td>
+        </tr>
+        <tr v-for="order in dat">
+          <td>{{order.id}}</td>
+          <td>{{order.client_id}}</td>
+          <td>{{order.owner_id}}</td>
+          <td>{{order.state}}</td>
+        </tr>
+	</div>
 	
-	
-	 <div v-if="UI=='loginForm'">
+	<div v-if="UI=='loginForm'">
 		</br>
 		ID: <input type="text"  v-model="id"/> <br/>
 		Password: <input type="text" v-model="pwd" />
@@ -114,7 +129,7 @@
 		<button @click="showRegistrationForm()">註冊</button>
 	 </div>
 	 
-	 <div v-if="UI=='registrationForm'">
+	<div v-if="UI=='registrationForm'">
 		<h2>註冊</h2>
 		<input type='button' @click="setUI('loginForm')" value="返回"><br />
 		ID: <input type="text" v-model="registration.id" /> <br />
@@ -141,8 +156,8 @@
 		cart : [],
 		totalPrice: 0,
 		userId: null,
-		myRole: 0 //來存註冊者的角色
-		
+		myRole: 0, //來存註冊者的角色
+		order: []
 	  }
 	},
 
@@ -154,7 +169,10 @@
 		  } else if (this.myRole === 99) { //99是商家
 			this.setUI('owner');
 			this.loadUserList();
-		  } else {
+		  } else if (this.myRole === 50){ //物流
+			this.setUI('logistics');
+			this.loadOrder();
+		  }else {
 			this.setUI('loginForm'); //還沒登入的話顯示登入畫面
  		  }
 		},
@@ -344,6 +362,16 @@
 				}
 			});
 		},
+		loadOrder: function () { 
+          const that = this;
+          fetch('controller.php?act=listOrder')
+            .then(function (response) {
+              return response.json();
+            })
+            .then(function (myJson) {
+              that.dat = myJson;
+            });
+        },
         setUI: function (page) {
           this.UI = page;
         }

@@ -20,6 +20,14 @@ switch ($act) {
 			echo json_encode($products);
 		}
 		return;
+	case "listOrder":
+        $order = getOrderList();
+        if ($order === false) {
+            echo json_encode(["error" => "Error fetching order list."]);
+        } else {
+            echo json_encode($order);
+        }
+        return;
     case "addProduct":
         $jsonStr = $_POST['dat'];
         $product = json_decode($jsonStr);
