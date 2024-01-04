@@ -63,6 +63,66 @@ function addProduct($name, $price, $detail, $remain, $id, $user_id)
     mysqli_stmt_execute($stmt);
     return true;
 }
+
+function checkout($cart, $user_id)
+{
+    global $db;
+
+    // 檢查購物車是否為空
+    if (empty($cart)) {
+        return ["error" => "購物車為空"];
+    }
+
+    // 開始事務
+    mysqli_begin_transaction($db);
+
+    try {
+        // 這裡可以進行進一步的購物車內容檢查，確保商品存在、庫存充足等
+
+        // 假設這裡是一個簡單的結帳邏輯，將購物車內容插入訂單表中
+        $insertOrderSql = "INSERT INTO `order` (product_id, quantity, client_id, owner_id, state) VALUES (?, ?, ?, ?, ?)";
+        $stmt = mysqli_prepare($db, $insertOrderSql);
+
+        foreach ($cart as $cartItem) {
+            $product_id = $cartItem['product_id'];
+            $quantity = $cartItem['quantity'];
+            $client_id = $user_id; // 假設 client_id 為使用者 ID
+            $owner_id = $cartItem['user_id']; // 假設 owner_id 為商品擁有者的 ID
+            $state = 1; // 假設 state=1 表示未處理訂單
+
+            // 綁定參數
+            mysqli_stmt_bind_param($stmt, "iiiii", $product_id, $quantity, $client_id, $owner_id, $state);
+            
+            // 執行準備好的語句
+            mysqli_stmt_execute($stmt);
+        }
+
+        // 清空購物車（這裡需要根據實際情況實現清空購物車的邏輯）
+        clearCart($user_id);
+        
+
+        // 提交事務
+        mysqli_commit($db);
+
+        return ["message" => "結帳成功"];
+        
+    } catch (Exception $e) {
+        // 如果發生錯誤，回滾事務
+        mysqli_rollback($db);
+        return ["error" => "結帳時發生錯誤：" . $e->getMessage()];
+    }
+}
+
+
+function clearCart($user_id)
+{
+    global $db;
+    $clearCartSql = "DELETE FROM cart WHERE user_id = ?";
+    $stmt = mysqli_prepare($db, $clearCartSql);
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
+    mysqli_stmt_execute($stmt);
+}
+
 function updateProduct($id, $name, $price, $detail)
 {
 	echo $id, $name, $price, $detail;
@@ -149,7 +209,7 @@ function removeFromCart($id)
 function getCartList($user_id)
 {
     global $db;
-    $sql = "SELECT cart.id, product.name, product.price, cart.quantity FROM cart LEFT JOIN product ON product.id = cart.product_id WHERE cart.user_id = ?";
+    $sql = "SELECT product.user_id, product.name, product.price, cart.quantity, cart.id, cart.product_id , cart.quantity, cart.user_id FROM cart LEFT JOIN product ON product.id = cart.product_id WHERE cart.user_id = ?";
     $stmt = mysqli_prepare($db, $sql);
     mysqli_stmt_bind_param($stmt, "s", $user_id);
     mysqli_stmt_execute($stmt);

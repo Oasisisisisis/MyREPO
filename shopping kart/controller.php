@@ -28,6 +28,18 @@ switch ($act) {
             echo json_encode($order);
         }
         return;
+    case "checkout":
+        $user_id = $_REQUEST['userId'];
+        
+        // 獲取購物車內容
+        $cart = getCartList($user_id);
+        
+        // 呼叫結帳函數
+        $checkoutResult = checkout($cart, $user_id);
+        
+        // 返回結果
+        echo json_encode($checkoutResult);
+        return;
     case "addProduct":
         $jsonStr = $_POST['dat'];
         $product = json_decode($jsonStr);
