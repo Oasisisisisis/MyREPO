@@ -173,21 +173,21 @@
 
   <script>
     const productApp = Vue.createApp({
-	data() {
-	  return {
-		UI: 'main',
-		dat: [],
-		isCartOpen: false,
-		cart : [],
-		totalPrice: 0,
-		userId: null,
-		myRole: 0, //來存註冊者的角色
-		orderList: []
-	  }
-	},
+	  data() {
+	    return {
+		  UI: 'main',
+		  dat: [],
+	  	isCartOpen: false,
+	  	cart : [],
+	  	totalPrice: 0,
+	  	userId: null,
+	  	myRole: 0, //來存註冊者的角色
+	  	orderList: []
+	    }
+	  },
 
       methods: {
-		checkLogin: function() {
+		  checkLogin: function() {
 		  if (this.myRole === 1) { //1是客戶
 			this.setUI('main');
 			this.loadAllList();
@@ -200,7 +200,7 @@
 		  }else {
 			this.setUI('loginForm'); //還沒登入的話顯示登入畫面
  		  }
-		},
+		  },
 		login: function() { //登入後與後台確認是否正確
 		  const that = this;
 		  let mydat = new FormData();
@@ -237,16 +237,17 @@
 			that.checkLogin();
 		  })
 		},
-        loadAllList: function () { //在客戶頁面列出所有商品內容
-          const that = this;
-          fetch('controller.php?act=listProduct')
-            .then(function (response) {
-              return response.json();
-            })
-            .then(function (myJson) {
-              that.dat = myJson;
-            });
-        },
+        
+    loadAllList: function () { //在客戶頁面列出所有商品內容
+      const that = this;
+      fetch('controller.php?act=listProduct')
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (myJson) {
+          that.dat = myJson;
+        });
+    },
 		loadUserList: function () { //在商家頁面只列出自己的商品
 			const that = this; 
 			fetch('controller.php?act=listUserProduct&userId=' + this.userId) //把id傳到後台 讓model判斷 只回傳同id的商品
@@ -257,6 +258,8 @@
 					that.dat = myJson;
 				});
 		},
+
+    // 購物車
         loadCart: function () {
           const that = this;
 		  let url="controller.php?act=listCart&userId="+ this.userId;
@@ -355,6 +358,8 @@
           };
           this.setUI('editForm');
         },
+
+
         // 註冊
 		showRegistrationForm: function() {
 			this.registration = {
@@ -388,6 +393,8 @@
 				}
 			});
 		},
+
+    // 管理商家訂單物流
 		loadOrder: function () { 
           const that = this;
           fetch('controller.php?act=listOrder')
