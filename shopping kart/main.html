@@ -73,6 +73,7 @@
 	  </br>
 	  </br>
       <table border=1>
+        <h2>我的商品</h2>
         <tr>
           <td>序號</td>
           <td>商品名稱</td>
@@ -89,6 +90,30 @@
           <td>{{product.remain}}</td>
           <td>
             <button @click="del(product.id)">刪</button><button @click="setEditUI(product)">改</button>
+          </td>
+        </tr>
+      </table>
+
+      <table border=1>
+        <h2>我的訂單</h2>
+        <tr>
+          <td>序號</td>
+          <td>商品名稱</td>
+          <td>客戶</td>
+          <td>狀態</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+        <tr v-for="order in orderList">
+          <td>{{order.id}}</td>
+          <td>{{order.product_id}}</td>
+          <td>{{order.client_id}}</td>
+          <td>{{order.state}}</td>
+          <td>
+            <button @click="setEditUI(product)">確認</button><!-- 改成狀態處理中-->
+          </td>
+          <td>
+            <button @click="del(product.id)">寄送</button><!-- 改成狀態寄送中-->
           </td>
         </tr>
       </table>
@@ -157,7 +182,7 @@
 		totalPrice: 0,
 		userId: null,
 		myRole: 0, //來存註冊者的角色
-		order: []
+		orderList: []
 	  }
 	},
 
@@ -330,6 +355,7 @@
           };
           this.setUI('editForm');
         },
+        // 註冊
 		showRegistrationForm: function() {
 			this.registration = {
 				id: '',
@@ -369,7 +395,7 @@
               return response.json();
             })
             .then(function (myJson) {
-              that.dat = myJson;
+              that.orderList = myJson;
             });
         },
         setUI: function (page) {
