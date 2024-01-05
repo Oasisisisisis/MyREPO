@@ -40,6 +40,11 @@ switch ($act) {
         // 返回結果
         echo json_encode($checkoutResult);
         return;
+    case "viewOrders":
+        $user_id = $_REQUEST['userId'];
+        $order = getUserOrders($user_id); 
+        echo json_encode($order);
+        return;
     case "addProduct":
         $jsonStr = $_POST['dat'];
         $product = json_decode($jsonStr);
@@ -89,7 +94,7 @@ switch ($act) {
 
     echo json_encode($msg);
     return;
-    break;
+    
 
 	case "logout":
 		setcookie('loginRole',0,httponly:true);

@@ -123,6 +123,22 @@ function checkout($cart, $user_id)
     }
 }
 
+function getUserOrders($user_id)
+{
+  global $db;
+  $sql = "SELECT * FROM `order` WHERE client_id = ?";
+  $stmt = mysqli_prepare($db, $sql);
+  mysqli_stmt_bind_param($stmt, "s", $user_id);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+
+  $rows = array();
+  while ($r = mysqli_fetch_assoc($result)) {
+    $rows[] = $r;
+  }
+  return $rows;
+}
+
 
 function clearCart($user_id)
 {
