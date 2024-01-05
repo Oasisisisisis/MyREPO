@@ -21,7 +21,8 @@ switch ($act) {
 		}
 		return;
 	case "listOrder":
-        $order = getOrderList();
+        $owner_id = $_SESSION['id']; // 獲取當前登陸商家的id
+        $order = getOrderListByOwner(owner_id);
         if ($order === false) {
             echo json_encode(["error" => "Error fetching order list."]);
         } else {
