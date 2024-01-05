@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2024-01-02 06:59:10
+-- 產生時間： 2024-01-05 17:49:46
 -- 伺服器版本： 10.4.24-MariaDB
 -- PHP 版本： 8.1.6
 
@@ -39,10 +39,8 @@ CREATE TABLE `cart` (
 --
 
 INSERT INTO `cart` (`id`, `product_id`, `quantity`, `user_id`) VALUES
-(92, 15, 3, '2'),
 (93, 16, 2, 'A'),
 (94, 17, 11, 'A'),
-(95, 21, 5, '2'),
 (96, 18, 1, 'A');
 
 -- --------------------------------------------------------
@@ -65,8 +63,20 @@ CREATE TABLE `order` (
 --
 
 INSERT INTO `order` (`id`, `product_id`, `quantity`, `client_id`, `owner_id`, `state`) VALUES
-(1, 15, 3, '2', '1', 2),
-(2, 16, 2, 'A', '1', 2);
+(5, 15, 8, '2', '1', 1),
+(6, 16, 2, '2', '2', 1),
+(7, 17, 1, '2', '2', 1),
+(8, 18, 3, '2', '2', 1),
+(9, 21, 2, '2', '2', 1),
+(10, 15, 3, '2', '2', 1),
+(11, 15, 1, '2', '2', 1),
+(12, 15, 1, '2', '2', 1),
+(13, 15, 1, '2', '2', 1),
+(14, 15, 1, '2', '2', 1),
+(15, 15, 1, '2', '2', 1),
+(16, 17, 1, '2', '2', 1),
+(17, 18, 1, '2', '2', 1),
+(18, 15, 1, '2', '2', 1);
 
 -- --------------------------------------------------------
 
@@ -88,11 +98,26 @@ CREATE TABLE `product` (
 --
 
 INSERT INTO `product` (`id`, `name`, `price`, `remain`, `detail`, `user_id`) VALUES
-(15, 'coffee', 299, 8, 'good', '1'),
+(15, 'coffee', 299, 4, 'good', '1'),
 (16, 'chocolate', 120, 22, 'goodgoodgood', '1'),
-(17, 'iphone', 50000, 11, 'iphone15', '123'),
-(18, 'happyNewYear', 2024, 28, 'hi', '123'),
+(17, 'iphone', 50000, 10, 'iphone15', '123'),
+(18, 'happyNewYear', 2024, 27, 'hi', '123'),
 (21, 'pen', 10, 17, 'blue', '1');
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `review`
+--
+
+CREATE TABLE `review` (
+  `review_id` int(11) NOT NULL,
+  `order_id` int(123) NOT NULL,
+  `owner_id` varchar(123) NOT NULL,
+  `client_id` varchar(123) NOT NULL,
+  `state` int(123) NOT NULL,
+  `rating` int(123) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -115,7 +140,8 @@ INSERT INTO `user` (`id`, `pwd`, `role`) VALUES
 ('123', '123', 99),
 ('2', '2', 1),
 ('3', '3', 50),
-('A', '111', 1);
+('A', '111', 1),
+('cool', 'aaaaa', 99);
 
 --
 -- 已傾印資料表的索引
@@ -141,6 +167,12 @@ ALTER TABLE `product`
   ADD PRIMARY KEY (`id`);
 
 --
+-- 資料表索引 `review`
+--
+ALTER TABLE `review`
+  ADD PRIMARY KEY (`review_id`);
+
+--
 -- 資料表索引 `user`
 --
 ALTER TABLE `user`
@@ -154,19 +186,25 @@ ALTER TABLE `user`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `order`
 --
 ALTER TABLE `order`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `product`
 --
 ALTER TABLE `product`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
+-- 使用資料表自動遞增(AUTO_INCREMENT) `review`
+--
+ALTER TABLE `review`
+  MODIFY `review_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- 已傾印資料表的限制式
