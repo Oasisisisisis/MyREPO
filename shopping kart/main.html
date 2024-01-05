@@ -44,6 +44,7 @@
 
     <div id="list" v-if="UI=='main'"><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
         <button @click="openModal()">查看購物車</button>
+        <button @click="viewOrders()">查看訂單狀態</button>
 		<table border=1><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
             <tr>
               <td>序號</td>
@@ -341,6 +342,36 @@
     alert('結帳時發生錯誤');
   });
     },
+    viewOrders: function() {
+    const that = this;
+
+    // 使用後端 API 取得訂單狀態資訊
+    let url = "controller.php?act=viewOrders&userId=" + this.userId;
+
+    fetch(url)
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+        // 在這裡處理後端返回的訂單狀態資訊
+        if (data && data.length > 0) {
+          // 顯示訂單狀態
+          // 這裡只是簡單地使用 alert 顯示
+          let orderStatus = "訂單狀態：\n";
+          data.forEach(order => {
+            orderStatus += `訂單編號: ${order.id}, 商品名稱: ${order.product_id}, 狀態: ${order.state}\n`;
+          });
+
+          alert(orderStatus);
+        } else {
+          alert("沒有找到相關訂單資訊");
+        }
+      })
+      .catch(function(error) {
+        console.error('Error fetching order status:', error);
+        alert('取得訂單狀態時發生錯誤');
+      });
+  },
 		del: function (id) {
           const that = this;
           let url = "controller.php?act=del&id=" + id;
