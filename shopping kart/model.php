@@ -83,6 +83,10 @@ function checkout($cart, $user_id)
         $insertOrderSql = "INSERT INTO `order` (product_id, quantity, client_id, owner_id, state) VALUES (?, ?, ?, ?, ?)";
         $stmt = mysqli_prepare($db, $insertOrderSql);
 
+        // 更新商品庫存的預備語句
+        $updateProductSql = "UPDATE product SET remain = remain - ? WHERE id = ?";
+        $stmtUpdateProduct = mysqli_prepare($db, $updateProductSql);
+
         foreach ($cart as $cartItem) {
             $product_id = $cartItem['product_id'];
             $quantity = $cartItem['quantity'];
@@ -95,6 +99,12 @@ function checkout($cart, $user_id)
             
             // 執行準備好的語句
             mysqli_stmt_execute($stmt);
+
+            // 綁定參數
+            mysqli_stmt_bind_param($stmtUpdateProduct, "ii", $quantity, $product_id);
+            
+            // 執行更新商品庫存的語句
+            mysqli_stmt_execute($stmtUpdateProduct);
         }
 
         // 清空購物車（這裡需要根據實際情況實現清空購物車的邏輯）
