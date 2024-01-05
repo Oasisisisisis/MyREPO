@@ -16,11 +16,12 @@ function getProductList()
     return $rows;
 }
 
-function getOrderList()
+function getOrderListByOwner($owner_id)
 {
     global $db;
-    $sql = "SELECT id, client_id, owner_id, state FROM `order`;"; // 注意这里的``来转义order关键字
+    $sql = "SELECT id, client_id, owner_id, state FROM `order` WHERE owner_id = ?;"; 
     $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $owner_id); // 商家用戶的id
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 
