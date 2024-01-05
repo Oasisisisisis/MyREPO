@@ -109,12 +109,12 @@
           <td>{{order.id}}</td>
           <td>{{order.product_id}}</td>
           <td>{{order.client_id}}</td>
-          <td>{{order.state}}</td>
+          <td id = "orderStatus">1</td>
           <td>
-            <button @click="setEditUI(product)">確認</button><!-- 改成狀態處理中-->
+            <button @click="confirmOrder(order.id)">確認</button><!-- 改成狀態處理中-->
           </td>
           <td>
-            <button @click="del(product.id)">寄送</button><!-- 改成狀態寄送中-->
+            <button @click="shipOrder(order.id)">寄送</button><!-- 改成狀態寄送中-->
           </td>
         </tr>
       </table>
@@ -420,6 +420,21 @@
 				}
 			});
 		},
+
+    // 1 未處理
+    // 2 處理中
+    // 3 寄送中
+    // 4 已寄出
+    // 5 已送達
+    confirmOrder: function(id){ // 會變成2
+
+    },
+    shipOrder: function(id){ // 會變成3
+
+    },
+    getStatusText: function(statusCode){
+
+    },
 
     // 管理商家訂單物流
 		loadOrder: function () { 
