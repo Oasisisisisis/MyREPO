@@ -104,7 +104,7 @@ function checkout($cart, $user_id)
             $state = 1; // 假設 state=1 表示未處理訂單
 
             // 綁定參數
-            mysqli_stmt_bind_param($stmt, "iiiii", $product_id, $quantity, $client_id, $owner_id, $state);
+            mysqli_stmt_bind_param($stmt, "iissi", $product_id, $quantity, $client_id, $owner_id, $state);
 
             // 執行準備好的語句
             mysqli_stmt_execute($stmt);
