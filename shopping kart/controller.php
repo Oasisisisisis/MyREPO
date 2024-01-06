@@ -73,6 +73,11 @@ switch ($act) {
         $order = getUserOrders($user_id); 
         echo json_encode($order);
         return;
+    case "viewOrdersInfo":
+        $user_id = $_REQUEST['userId'];
+        $order = getUserOrdersInfo($user_id); 
+        echo json_encode($order);
+        return;
     case "addProduct":
         $jsonStr = $_POST['dat'];
         $product = json_decode($jsonStr);
@@ -100,30 +105,41 @@ switch ($act) {
 			echo json_encode($products);
 		}
 		return;
-
 	case "login":
-    $id = $_REQUEST['id'];
-    $pwd = $_REQUEST['pwd'];
+		$id = $_REQUEST['id'];
+		$pwd = $_REQUEST['pwd'];
 
-    $role = login($id, $pwd); 
-    if ($role > 0) {
-        $msg = [
-            "msg" => "OK",
-            "role" => $role,
-            "id" => $id 
-        ];
-    } else {
-        $msg = [
-            "msg" => "NO",
-            "role" => 0,
-            "id" => null 
-        ];
-    }
+		$role = login($id, $pwd); 
+		if ($role > 0) {
+			$msg = [
+				"msg" => "OK",
+				"role" => $role,
+				"id" => $id 
+			];
+		} else {
+			$msg = [
+				"msg" => "NO",
+				"role" => 0,
+				"id" => null 
+			];
+		}
 
-    echo json_encode($msg);
-    return;
-    
-
+		echo json_encode($msg);
+		return;
+	case "listLogisticsOrders":
+		$orders = getLogisticsOrders();
+		if ($orders === false) {
+			echo json_encode(["error" => "Error fetching logistics orders."]);
+		} else {
+			echo json_encode($orders);
+		}
+		return;
+	case "updateOrderStatus":
+		$clientId = $_REQUEST['clientId'];
+		$ownerId = $_REQUEST['ownerId'];
+		updateOrderStatus($clientId, $ownerId);
+		echo json_encode(['message' => 'Status Updated']);
+		break;
 	case "logout":
 		setcookie('loginRole',0,httponly:true);
 		break;

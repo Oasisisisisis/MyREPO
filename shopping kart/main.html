@@ -7,8 +7,7 @@
 </head>
 <body>
   <header>
-      <h1>ONLINE SHOP SITE--THE FIRST GROUP</h1>
-	  
+      <h1>ONLINE SHOP SITE--THE FIRST GROUP</h1>	  
   </header>
   
   <div id="main"> <!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
@@ -43,11 +42,12 @@
     </div>
 
     <div v-if="UI=='reviewForm'">
+	  <input type='button' @click="setUI('main')" value="返回"><br />
       <h2>評價表單</h2>
       
       <label for="selectedOwner">選擇商家：</label>
       <select v-model="reviewForm.selectedOwner">
-        <option v-for="orderItem in order" :value="orderItem.owner_id">{{ orderItem.owner_name }} </option>
+        <option v-for="orderItem in order" :value="orderItem.owner_id">{{ orderItem.owner_id }} </option>
       </select>
 
       <label for="rating">滿意度評價：</label>
@@ -58,15 +58,13 @@
         <option value="4">4顆星</option>
         <option value="5">5顆星</option>
       </select>
-      
-    
       <button @click="submitReview">提交評價</button>
     </div>
 
     <div id="list" v-if="UI=='main'"><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
         <button @click="openModal()">查看購物車</button>
         <button @click="viewOrders()">查看訂單狀態</button>
-        <button @click="showReviewForm(product_id)">評價</button>
+        <button @click="showReviewForm()">評價</button>
 		<table border=1><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
             <tr>
               <td>序號</td>
@@ -153,22 +151,6 @@
 	  <input type='button' @click="addProduct(newProduct)" value="save">
 	</div>
 
-	<div v-if="UI=='logistics'">
-	<h2>物流</h2>
-	<tr>
-          <td>序號</td>
-          <td>客戶</td>
-          <td>商家</td>
-          <td>狀態</td>
-          <td>-</td>
-        </tr>
-        <tr v-for="order in dat">
-          <td>{{order.id}}</td>
-          <td>{{order.client_id}}</td>
-          <td>{{order.owner_id}}</td>
-          <td>{{order.state}}</td>
-        </tr>
-	</div>
 	
 	<div v-if="UI=='loginForm'">
 		</br>
@@ -191,6 +173,27 @@
 		<input type='button' @click="register()" value="註冊">
 	</div>
 
+	<div v-if="UI=='logistics'">
+	  <header><h1>Logistics</h1></header>
+	  <table border=1>
+		<tr>
+		  <th>客戶ID</th>
+		  <th>商家ID</th>
+		  <th>狀態</th>
+		</tr>
+		<tr v-for="order in orderList">
+			<td>{{ order.client_id }}</td>
+			<td>{{ order.owner_id }}</td>
+			<td>{{ getStatusText(order.state) }}</td>
+			<td>
+				<button v-if="order.state === 3 || order.state === 4" @click="updateOrderStatus(order.client_id, order.owner_id)">更新狀態</button>
+			</td>
+		</tr>
+	  </table>
+	  <input type='button' @click="logout()" value="logout"/>
+	</div>
+
+
   </div>
 
 
@@ -207,6 +210,8 @@
 	  	userId: null,
 	  	myRole: 0, //來存註冊者的角色
 	  	orderList: [],
+		id:null,
+		pwd:null,
       reviewForm: {
       owner_id: null,
       state:null,
@@ -224,10 +229,14 @@
 		  } else if (this.myRole === 99) { //99是商家
 			this.setUI('owner');
 			this.loadUserList();
+<<<<<<< HEAD
       this.loadOrder();
 		  } else if (this.myRole === 50){ //物流
+=======
+		  } else if (this.myRole === 50) { // 物流角色
+>>>>>>> ShoppingKart/master
 			this.setUI('logistics');
-			this.loadOrder();
+			this.loadLogisticsOrders();
 		  }else {
 			this.setUI('loginForm'); //還沒登入的話顯示登入畫面
  		  }
@@ -373,17 +382,66 @@
     alert('結帳時發生錯誤');
   });
     },
-    showReviewForm(owner_id) {
-    if (this.reviewForm) {
+    viewOrders: function() {
+    const that = this;
+
+    // 使用後端 API 取得訂單狀態資訊
+    let url = "controller.php?act=viewOrders&userId=" + this.userId;
+
+    fetch(url)
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+        // 在這裡處理後端返回的訂單狀態資訊
+        if (data && data.length > 0) {
+          // 顯示訂單狀態
+          // 這裡只是簡單地使用 alert 顯示
+          let orderStatus = "訂單狀態：\n";
+          data.forEach(order => {
+            orderStatus += `訂單編號: ${order.id}, 商品名稱: ${order.product_id}, 狀態: ${order.state}\n`;
+          });
+
+          alert(orderStatus);
+        } else {
+          alert("沒有找到相關訂單資訊");
+        }
+      })
+      .catch(function(error) {
+        console.error('Error fetching order status:', error);
+        alert('取得訂單狀態時發生錯誤');
+      });
+  },
+  showReviewForm(owner_id) {
+  const that = this;
+  if (this.reviewForm) {
     this.reviewForm.owner_id = owner_id;
     this.setUI('reviewForm');
-    } else {
+  } else {
     alert("評價表單未初始化");
     this.reviewForm.owner_id = owner_id;
     this.setUI('reviewForm');
-    }
-  },
-  submitReview() {
+  }
+
+  // 在这里调用获取订单信息的方法
+  let url = "controller.php?act=viewOrdersInfo&userId=" + this.userId;
+  fetch(url)
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(data) {
+      // 在这里更新评价表单中的商家选择下拉框
+      that.order = data;
+
+      // 手动强制更新 Vue 组件
+      that.$forceUpdate();
+    })
+    .catch(function(error) {
+      console.error('Error fetching orders:', error);
+      alert('获取订单时发生错误');
+    });
+},
+submitReview() {
   // 在這裡處理提交評價的相應操作
 
   // 檢查訂單狀態是否為5（已送達）
@@ -423,36 +481,7 @@
       alert('評價時發生錯誤');
     });
 },
-    viewOrders: function() {
-    const that = this;
-
-    // 使用後端 API 取得訂單狀態資訊
-    let url = "controller.php?act=viewOrders&userId=" + this.userId;
-
-    fetch(url)
-      .then(function(response) {
-        return response.json();
-      })
-      .then(function(data) {
-        // 在這裡處理後端返回的訂單狀態資訊
-        if (data && data.length > 0) {
-          // 顯示訂單狀態
-          // 這裡只是簡單地使用 alert 顯示
-          let orderStatus = "訂單狀態：\n";
-          data.forEach(order => {
-            orderStatus += `訂單編號: ${order.id}, 商品名稱: ${order.product_id}, 狀態: ${order.state}\n`;
-          });
-
-          alert(orderStatus);
-        } else {
-          alert("沒有找到相關訂單資訊");
-        }
-      })
-      .catch(function(error) {
-        console.error('Error fetching order status:', error);
-        alert('取得訂單狀態時發生錯誤');
-      });
-  },
+   
 		del: function (id) {
           const that = this;
           let url = "controller.php?act=del&id=" + id;
@@ -558,7 +587,52 @@
               that.orderList = myJson;
             });
         },
+<<<<<<< HEAD
 
+=======
+		loadLogisticsOrders: function () {
+			const that = this;
+			fetch('controller.php?act=listLogisticsOrders')
+				.then(function (response) {
+					return response.json();
+				})
+				.then(function (myJson) {
+					that.orderList = myJson.filter(order => order.state === 3 || order.state === 4 || order.state === 5);
+				})
+				.catch(function (error) {
+					console.error('Error fetching logistics orders:', error);
+				});
+		},
+		updateOrderStatus: function(clientId, ownerId) {
+			const that = this;
+			let url = "controller.php?act=updateOrderStatus&clientId=" + clientId + "&ownerId=" + ownerId;
+			fetch(url, { method: 'POST' })
+				.then(() => {
+					that.loadLogisticsOrders(); 
+					that.setUI('logistics');
+				})
+				.catch(error => {
+					console.error('Error updating order status:', error);
+				});
+		},
+
+		getStatusText: function(statusCode) {
+			switch(statusCode) {
+				case 1:
+					return '未處理';
+				case 2:
+					return '處理中';
+				case 3:
+					return '寄送中';
+				case 4:
+					return '已寄送';
+				case 5:
+					return '已送達';
+				default:
+					return '未知';
+			}
+		},
+>>>>>>> ShoppingKart/master
         setUI: function (page) {
           this.UI = page;
         }
