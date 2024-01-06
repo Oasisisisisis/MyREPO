@@ -42,9 +42,31 @@
       </div>
     </div>
 
+    <div v-if="UI=='reviewForm'">
+      <h2>評價表單</h2>
+      
+      <label for="selectedOwner">選擇商家：</label>
+      <select v-model="reviewForm.selectedOwner">
+        <option v-for="orderItem in order" :value="orderItem.owner_id">{{ orderItem.owner_name }} </option>
+      </select>
+
+      <label for="rating">滿意度評價：</label>
+      <select v-model="reviewForm.rating">
+        <option value="1">1顆星</option>
+        <option value="2">2顆星</option>
+        <option value="3">3顆星</option>
+        <option value="4">4顆星</option>
+        <option value="5">5顆星</option>
+      </select>
+      
+    
+      <button @click="submitReview">提交評價</button>
+    </div>
+
     <div id="list" v-if="UI=='main'"><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
         <button @click="openModal()">查看購物車</button>
         <button @click="viewOrders()">查看訂單狀態</button>
+        <button @click="showReviewForm(product_id)">評價</button>
 		<table border=1><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
             <tr>
               <td>序號</td>
@@ -184,7 +206,13 @@
 	  	totalPrice: 0,
 	  	userId: null,
 	  	myRole: 0, //來存註冊者的角色
-	  	orderList: []
+	  	orderList: [],
+      reviewForm: {
+      owner_id: null,
+      state:null,
+      rating: 1, // 預設1顆星
+      
+        },
 	    }
 	  },
 
@@ -344,6 +372,56 @@
     alert('結帳時發生錯誤');
   });
     },
+    showReviewForm(owner_id) {
+    if (this.reviewForm) {
+    this.reviewForm.owner_id = owner_id;
+    this.setUI('reviewForm');
+    } else {
+    alert("評價表單未初始化");
+    this.reviewForm.owner_id = owner_id;
+    this.setUI('reviewForm');
+    }
+  },
+  submitReview() {
+  // 在這裡處理提交評價的相應操作
+
+  // 檢查訂單狀態是否為5（已送達）
+  if (this.reviewForm.order_state !== 5) {
+    alert('只有在訂單已送達的狀態下才能進行評價。');
+    return;
+  }
+
+  // 使用 this.reviewForm.selectedOwner 來獲取選定的商家
+  const selectedOwner = this.reviewForm.selectedOwner;
+
+  fetch('controller.php?act=submitReview', {
+    method: 'POST',
+    body: JSON.stringify({
+      order_id: this.reviewForm.order_id,
+      owner_id: selectedOwner, // 使用選定的商家
+      client_id: this.reviewForm.client_id,
+      rating: this.reviewForm.rating,
+      // 其他評價表單相關屬性
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      if (data.message === 'OK') {
+        alert('評價成功');
+        this.setUI('main');
+      } else {
+        alert('評價失敗');
+      }
+    })
+    .catch(error => {
+      console.error('Error submitting review:', error);
+      alert('評價時發生錯誤');
+    });
+},
     viewOrders: function() {
     const that = this;
 

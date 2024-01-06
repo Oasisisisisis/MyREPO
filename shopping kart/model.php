@@ -124,6 +124,33 @@ function checkout($cart, $user_id)
     }
 }
 
+function submitReviewToModel($order_id, $owner_id, $client_id, $state, $rating) {
+    global $conn;
+
+    // 根據訂單編號（order_id）從 order 表中獲取商家的 user_id
+    $sql = "SELECT ownerid FROM `order` WHERE `id` = '$order_id'";
+    $result = mysqli_query($conn, $sql);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $owner_id_from_order = $row['owner_id'];
+
+        // 檢查提交的 owner_id 是否與 order 表中的 owner_id 一致
+        if ($owner_id_from_order === $owner_id) {
+            // 插入評價表
+            $sql = "INSERT INTO `review` (`order_id`, `owner_id`, `client_id`, `state`, `rating`) 
+                    VALUES ('$order_id', '$owner_id', '$client_id', '$state', '$rating')";
+
+            // 執行 SQL 語句
+            $result = mysqli_query($conn, $sql);
+
+            return $result;
+        }
+    }
+
+    return false;
+}
+
 function getUserOrders($user_id)
 {
   global $db;
