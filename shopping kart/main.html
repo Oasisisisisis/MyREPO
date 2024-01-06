@@ -132,7 +132,7 @@
           <td>{{order.product_id}}</td>
           <td>{{order.quantity}}</td>
           <td>{{order.client_id}}</td>
-          <td>{{order.state}}</td>
+          <td>{{ getStatusText(order.state) }}</td>
           <td>
             <button @click="confirmOrder(order.id)">確認</button><!-- 改成狀態處理中-->
           </td>
@@ -573,6 +573,74 @@ submitReview() {
 					that.orderList = myJson;
 				});
 		},
+    // change to state 1
+    unconfirmOrder: function(orderId) {
+      const that = this;
+			let url = "controller.php?act=unconfirmOrder&orderId=" + orderId;
+			fetch(url, { method: 'POST' })
+				.then(() => {
+					that.loadOrder(); 
+					that.setUI('owner');
+				})
+				.catch(error => {
+					console.error('Error updating order status:', error);
+				});
+},
+    // change to state 2
+  confirmOrder: function(orderId) {
+    const that = this;
+			let url = "controller.php?act=confirmOrder&orderId=" + orderId;
+			fetch(url, { method: 'POST' })
+				.then(() => {
+					that.loadOrder(); 
+					that.setUI('owner');
+				})
+				.catch(error => {
+					console.error('Error updating order status:', error);
+				});
+},
+
+
+    // change to state3
+    shipOrder: function(orderId){
+      const that = this;
+			let url = "controller.php?act=shipOrder&orderId=" + orderId;
+			fetch(url, { method: 'POST' })
+				.then(() => {
+					that.loadOrder(); 
+					that.setUI('owner');
+				})
+				.catch(error => {
+					console.error('Error updating order status:', error);
+				});
+    },
+
+    // change to state 4
+    deliverOrder: function(orderId){
+      const that = this;
+			let url = "controller.php?act=deliverOrder&orderId=" + orderId;
+			fetch(url, { method: 'POST' })
+				.then(() => {
+					that.loadOrder(); 
+					that.setUI('owner');
+				})
+				.catch(error => {
+					console.error('Error updating order status:', error);
+				});
+    },
+    // change to state 5
+    arriveOrder: function(orderId){
+      const that = this;
+			let url = "controller.php?act=arriveOrder&orderId=" + orderId;
+			fetch(url, { method: 'POST' })
+				.then(() => {
+					that.loadOrder(); 
+					that.setUI('owner');
+				})
+				.catch(error => {
+					console.error('Error updating order status:', error);
+				});
+    },
 
 		loadLogisticsOrders: function () {
 			const that = this;

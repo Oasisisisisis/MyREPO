@@ -29,6 +29,31 @@ switch ($act) {
             echo json_encode($order);
         }
         return;
+    case "unconfirmOrder":
+        $orderId = $_REQUEST['orderId'];
+        unconfirmOrder($orderId);
+        echo json_encode(['message' => 'Status Updated']);
+        break;
+    case "confirmOrder":
+		$orderId = $_REQUEST['orderId'];
+		confirmOrder($orderId);
+		echo json_encode(['message' => 'Status Updated']);
+		break;
+    case "shipOrder":
+        $orderId = $_REQUEST['orderId'];
+        shipOrder($orderId);
+        echo json_encode(['message' => 'Status Updated']);
+        break;
+    case "deliverOrder":
+        $orderId = $_REQUEST['orderId'];
+        deliverOrder($orderId);
+        echo json_encode(['message' => 'Status Updated']);
+        break;
+    case "arriveOrder":
+        $orderId = $_REQUEST['orderId'];
+        arriveOrder($orderId);
+        echo json_encode(['message' => 'Status Updated']);
+        break;
     case "checkout":
         $user_id = $_REQUEST['userId'];
         

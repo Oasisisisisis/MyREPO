@@ -32,6 +32,46 @@ function getOrderListByOwner($owner_id)
     return $rows;
 }
 
+function unconfirmOrder($orderId) {
+    global $db;
+    $sql = "UPDATE `order` SET state = 1 WHERE id = ?";
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $orderId);
+    return mysqli_stmt_execute($stmt);
+}
+
+function confirmOrder($orderId) {
+    global $db;
+    $sql = "UPDATE `order` SET state = 2 WHERE id = ?";
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $orderId);
+    return mysqli_stmt_execute($stmt);
+}
+
+function shipOrder($orderId) {
+    global $db;
+    $sql = "UPDATE `order` SET state = 3 WHERE id = ?";
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $orderId);
+    return mysqli_stmt_execute($stmt);
+}
+
+function deliverOrder($orderId) {
+    global $db;
+    $sql = "UPDATE `order` SET state = 4 WHERE id = ?";
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $orderId);
+    return mysqli_stmt_execute($stmt);
+}
+
+function arriveOrder($orderId) {
+    global $db;
+    $sql = "UPDATE `order` SET state = 5 WHERE id = ?";
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $orderId);
+    return mysqli_stmt_execute($stmt);
+}
+
 function getUserProductList($user_id)
 {
     global $db;
