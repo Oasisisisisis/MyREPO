@@ -92,31 +92,38 @@ function checkout($cart, $user_id)
             $product_id = $cartItem['product_id'];
             $quantity = $cartItem['quantity'];
             $client_id = $user_id; // 假設 client_id 為使用者 ID
-            $owner_id = $cartItem['user_id']; // 假設 owner_id 為商品擁有者的 ID
+
+            // 根據 product_id 查詢商品擁有者的 owner_id
+            $owner_id = getProductOwnerID($product_id);
+
+            if ($owner_id === null) {
+                // 如果無法獲取 owner_id，拋出錯誤
+                throw new Exception("無法獲取商品擁有者的ID");
+            }
+
             $state = 1; // 假設 state=1 表示未處理訂單
 
             // 綁定參數
             mysqli_stmt_bind_param($stmt, "iiiii", $product_id, $quantity, $client_id, $owner_id, $state);
-            
+
             // 執行準備好的語句
             mysqli_stmt_execute($stmt);
 
             // 綁定參數
             mysqli_stmt_bind_param($stmtUpdateProduct, "ii", $quantity, $product_id);
-            
+
             // 執行更新商品庫存的語句
             mysqli_stmt_execute($stmtUpdateProduct);
         }
 
         // 清空購物車（這裡需要根據實際情況實現清空購物車的邏輯）
         clearCart($user_id);
-        
 
         // 提交事務
         mysqli_commit($db);
 
         return ["message" => "結帳成功"];
-        
+
     } catch (Exception $e) {
         // 如果發生錯誤，回滾事務
         mysqli_rollback($db);
@@ -124,11 +131,29 @@ function checkout($cart, $user_id)
     }
 }
 
+// 這個函式用來獲取商品擁有者的 owner_id
+function getProductOwnerID($product_id)
+{
+    global $db;
+    $sql = "SELECT user_id FROM product WHERE id = ?";
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $product_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($result)) {
+        return $row['user_id'];
+    }
+
+    return null; // 如果找不到對應的商品擁有者，返回 null
+}
+
+
 function submitReviewToModel($order_id, $owner_id, $client_id, $state, $rating) {
     global $conn;
 
     // 根據訂單編號（order_id）從 order 表中獲取商家的 user_id
-    $sql = "SELECT ownerid FROM `order` WHERE `id` = '$order_id'";
+    $sql = "SELECT owner_id FROM `order` WHERE `id` = '$order_id'";
     $result = mysqli_query($conn, $sql);
 
     if ($result && mysqli_num_rows($result) > 0) {
@@ -150,6 +175,43 @@ function submitReviewToModel($order_id, $owner_id, $client_id, $state, $rating) 
 
     return false;
 }
+
+function getUserOrdersInfo($user_id)
+{
+  global $db;
+
+  // 準備SQL查詢語句，選擇`order`資料表中所有欄位
+  $sql = "SELECT owner_id FROM `order` WHERE client_id = ?";
+
+  // 使用mysqli_prepare函式來準備SQL語句，並將結果存放在$stmt中
+  $stmt = mysqli_prepare($db, $sql);
+
+  // 使用mysqli_stmt_bind_param函式將參數綁定到SQL語句中，這裡是將$user_id綁定到語句中的問號處
+  mysqli_stmt_bind_param($stmt, "s", $user_id);
+
+  // 執行SQL查詢
+  mysqli_stmt_execute($stmt);
+
+  // 取得查詢結果的結果集
+  $result = mysqli_stmt_get_result($stmt);
+
+  // 宣告一個陣列$rows來存放查詢結果的每一行資料
+  $rows = array();
+
+  // 使用mysqli_fetch_assoc函式將結果集轉換成關聯陣列，並將每一行資料加入到$rows陣列中
+  while ($r = mysqli_fetch_assoc($result)) {
+    // 在每個資料行中新增 owner_id
+    $owner_id = $r['owner_id'];
+    $r['owner_id'] = $owner_id;
+
+    // 將資料行加入到$rows陣列中
+    $rows[] = $r;
+  }
+
+  // 回傳包含所有訂單資料的陣列$rows
+  return $rows;
+}
+
 
 function getUserOrders($user_id)
 {

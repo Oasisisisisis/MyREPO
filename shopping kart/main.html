@@ -47,7 +47,7 @@
       
       <label for="selectedOwner">選擇商家：</label>
       <select v-model="reviewForm.selectedOwner">
-        <option v-for="orderItem in order" :value="orderItem.owner_id">{{ orderItem.owner_name }} </option>
+        <option v-for="orderItem in order" :value="orderItem.owner_id">{{ orderItem.owner_id }} </option>
       </select>
 
       <label for="rating">滿意度評價：</label>
@@ -66,7 +66,7 @@
     <div id="list" v-if="UI=='main'"><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
         <button @click="openModal()">查看購物車</button>
         <button @click="viewOrders()">查看訂單狀態</button>
-        <button @click="showReviewForm(product_id)">評價</button>
+        <button @click="showReviewForm()">評價</button>
 		<table border=1><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
             <tr>
               <td>序號</td>
@@ -372,17 +372,66 @@
     alert('結帳時發生錯誤');
   });
     },
-    showReviewForm(owner_id) {
-    if (this.reviewForm) {
+    viewOrders: function() {
+    const that = this;
+
+    // 使用後端 API 取得訂單狀態資訊
+    let url = "controller.php?act=viewOrders&userId=" + this.userId;
+
+    fetch(url)
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+        // 在這裡處理後端返回的訂單狀態資訊
+        if (data && data.length > 0) {
+          // 顯示訂單狀態
+          // 這裡只是簡單地使用 alert 顯示
+          let orderStatus = "訂單狀態：\n";
+          data.forEach(order => {
+            orderStatus += `訂單編號: ${order.id}, 商品名稱: ${order.product_id}, 狀態: ${order.state}\n`;
+          });
+
+          alert(orderStatus);
+        } else {
+          alert("沒有找到相關訂單資訊");
+        }
+      })
+      .catch(function(error) {
+        console.error('Error fetching order status:', error);
+        alert('取得訂單狀態時發生錯誤');
+      });
+  },
+  showReviewForm(owner_id) {
+  const that = this;
+  if (this.reviewForm) {
     this.reviewForm.owner_id = owner_id;
     this.setUI('reviewForm');
-    } else {
+  } else {
     alert("評價表單未初始化");
     this.reviewForm.owner_id = owner_id;
     this.setUI('reviewForm');
-    }
-  },
-  submitReview() {
+  }
+
+  // 在这里调用获取订单信息的方法
+  let url = "controller.php?act=viewOrdersInfo&userId=" + this.userId;
+  fetch(url)
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(data) {
+      // 在这里更新评价表单中的商家选择下拉框
+      that.order = data;
+
+      // 手动强制更新 Vue 组件
+      that.$forceUpdate();
+    })
+    .catch(function(error) {
+      console.error('Error fetching orders:', error);
+      alert('获取订单时发生错误');
+    });
+},
+submitReview() {
   // 在這裡處理提交評價的相應操作
 
   // 檢查訂單狀態是否為5（已送達）
@@ -422,36 +471,7 @@
       alert('評價時發生錯誤');
     });
 },
-    viewOrders: function() {
-    const that = this;
-
-    // 使用後端 API 取得訂單狀態資訊
-    let url = "controller.php?act=viewOrders&userId=" + this.userId;
-
-    fetch(url)
-      .then(function(response) {
-        return response.json();
-      })
-      .then(function(data) {
-        // 在這裡處理後端返回的訂單狀態資訊
-        if (data && data.length > 0) {
-          // 顯示訂單狀態
-          // 這裡只是簡單地使用 alert 顯示
-          let orderStatus = "訂單狀態：\n";
-          data.forEach(order => {
-            orderStatus += `訂單編號: ${order.id}, 商品名稱: ${order.product_id}, 狀態: ${order.state}\n`;
-          });
-
-          alert(orderStatus);
-        } else {
-          alert("沒有找到相關訂單資訊");
-        }
-      })
-      .catch(function(error) {
-        console.error('Error fetching order status:', error);
-        alert('取得訂單狀態時發生錯誤');
-      });
-  },
+   
 		del: function (id) {
           const that = this;
           let url = "controller.php?act=del&id=" + id;

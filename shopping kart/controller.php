@@ -73,6 +73,11 @@ switch ($act) {
         $order = getUserOrders($user_id); 
         echo json_encode($order);
         return;
+    case "viewOrdersInfo":
+        $user_id = $_REQUEST['userId'];
+        $order = getUserOrdersInfo($user_id); 
+        echo json_encode($order);
+        return;
     case "addProduct":
         $jsonStr = $_POST['dat'];
         $product = json_decode($jsonStr);
