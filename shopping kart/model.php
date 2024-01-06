@@ -131,6 +131,31 @@ function checkout($cart, $user_id)
     }
 }
 
+function getLogisticsOrders() {
+    global $db;
+    // 修改 SQL 查詢以僅返回客戶ID和商家ID的唯一組合
+    $sql = "SELECT client_id, owner_id, MAX(state) as state FROM `order` GROUP BY client_id, owner_id";
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    $rows = array();
+    while ($r = mysqli_fetch_assoc($result)) {
+        $rows[] = $r;
+    }
+    return $rows;
+}
+
+
+function updateOrderStatus($clientId, $ownerId) {
+    global $db;
+    $sql = "UPDATE `order` SET state = state + 1 WHERE client_id = ? AND owner_id = ?";
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, "ii", $clientId, $ownerId);
+    return mysqli_stmt_execute($stmt);
+}
+
+
 // 這個函式用來獲取商品擁有者的 owner_id
 function getProductOwnerID($product_id)
 {
@@ -370,5 +395,6 @@ function register($id, $pwd, $role) {
     mysqli_stmt_execute($stmt);
     return true;
 }
+
 
 ?>

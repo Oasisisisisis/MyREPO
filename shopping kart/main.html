@@ -7,8 +7,7 @@
 </head>
 <body>
   <header>
-      <h1>ONLINE SHOP SITE--THE FIRST GROUP</h1>
-	  
+      <h1>ONLINE SHOP SITE--THE FIRST GROUP</h1>	  
   </header>
   
   <div id="main"> <!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
@@ -43,6 +42,7 @@
     </div>
 
     <div v-if="UI=='reviewForm'">
+	  <input type='button' @click="setUI('main')" value="返回"><br />
       <h2>評價表單</h2>
       
       <label for="selectedOwner">選擇商家：</label>
@@ -58,8 +58,6 @@
         <option value="4">4顆星</option>
         <option value="5">5顆星</option>
       </select>
-      
-    
       <button @click="submitReview">提交評價</button>
     </div>
 
@@ -153,22 +151,6 @@
 	  <input type='button' @click="addProduct(newProduct)" value="save">
 	</div>
 
-	<div v-if="UI=='logistics'">
-	<h2>物流</h2>
-	<tr>
-          <td>序號</td>
-          <td>客戶</td>
-          <td>商家</td>
-          <td>狀態</td>
-          <td>-</td>
-        </tr>
-        <tr v-for="order in dat">
-          <td>{{order.id}}</td>
-          <td>{{order.client_id}}</td>
-          <td>{{order.owner_id}}</td>
-          <td>{{order.state}}</td>
-        </tr>
-	</div>
 	
 	<div v-if="UI=='loginForm'">
 		</br>
@@ -191,6 +173,27 @@
 		<input type='button' @click="register()" value="註冊">
 	</div>
 
+	<div v-if="UI=='logistics'">
+	  <header><h1>Logistics</h1></header>
+	  <table border=1>
+		<tr>
+		  <th>客戶ID</th>
+		  <th>商家ID</th>
+		  <th>狀態</th>
+		</tr>
+		<tr v-for="order in orderList">
+			<td>{{ order.client_id }}</td>
+			<td>{{ order.owner_id }}</td>
+			<td>{{ getStatusText(order.state) }}</td>
+			<td>
+				<button v-if="order.state === 3 || order.state === 4" @click="updateOrderStatus(order.client_id, order.owner_id)">更新狀態</button>
+			</td>
+		</tr>
+	  </table>
+	  <input type='button' @click="logout()" value="logout"/>
+	</div>
+
+
   </div>
 
 
@@ -207,6 +210,8 @@
 	  	userId: null,
 	  	myRole: 0, //來存註冊者的角色
 	  	orderList: [],
+		id:null,
+		pwd:null,
       reviewForm: {
       owner_id: null,
       state:null,
@@ -224,9 +229,9 @@
 		  } else if (this.myRole === 99) { //99是商家
 			this.setUI('owner');
 			this.loadUserList();
-		  } else if (this.myRole === 50){ //物流
+		  } else if (this.myRole === 50) { // 物流角色
 			this.setUI('logistics');
-			this.loadOrder();
+			this.loadLogisticsOrders();
 		  }else {
 			this.setUI('loginForm'); //還沒登入的話顯示登入畫面
  		  }
@@ -577,6 +582,48 @@ submitReview() {
               that.orderList = myJson;
             });
         },
+		loadLogisticsOrders: function () {
+			const that = this;
+			fetch('controller.php?act=listLogisticsOrders')
+				.then(function (response) {
+					return response.json();
+				})
+				.then(function (myJson) {
+					that.orderList = myJson.filter(order => order.state === 3 || order.state === 4 || order.state === 5);
+				})
+				.catch(function (error) {
+					console.error('Error fetching logistics orders:', error);
+				});
+		},
+		updateOrderStatus: function(clientId, ownerId) {
+			const that = this;
+			let url = "controller.php?act=updateOrderStatus&clientId=" + clientId + "&ownerId=" + ownerId;
+			fetch(url, { method: 'POST' })
+				.then(() => {
+					that.loadLogisticsOrders(); 
+					that.setUI('logistics');
+				})
+				.catch(error => {
+					console.error('Error updating order status:', error);
+				});
+		},
+
+		getStatusText: function(statusCode) {
+			switch(statusCode) {
+				case 1:
+					return '未處理';
+				case 2:
+					return '處理中';
+				case 3:
+					return '寄送中';
+				case 4:
+					return '已寄送';
+				case 5:
+					return '已送達';
+				default:
+					return '未知';
+			}
+		},
         setUI: function (page) {
           this.UI = page;
         }
