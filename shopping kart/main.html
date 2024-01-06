@@ -121,6 +121,7 @@
         <tr>
           <td>序號</td>
           <td>商品名稱</td>
+          <td>數量</td>
           <td>客戶</td>
           <td>狀態</td>
           <td>-</td>
@@ -129,8 +130,9 @@
         <tr v-for="order in orderList">
           <td>{{order.id}}</td>
           <td>{{order.product_id}}</td>
+          <td>{{order.quantity}}</td>
           <td>{{order.client_id}}</td>
-          <td id = "orderStatus">1</td>
+          <td>{{order.state}}</td>
           <td>
             <button @click="confirmOrder(order.id)">確認</button><!-- 改成狀態處理中-->
           </td>
@@ -229,6 +231,7 @@
 		  } else if (this.myRole === 99) { //99是商家
 			this.setUI('owner');
 			this.loadUserList();
+      this.loadOrder();
 		  } else if (this.myRole === 50) { // 物流角色
 			this.setUI('logistics');
 			this.loadLogisticsOrders();
@@ -254,6 +257,7 @@
 			console.log(data);
 			if (data.role > 0) {
 			  that.userId = data.id; //將id存起來 以便後面判斷對應其項目
+        that.owner_Id = data.id
 			  that.myRole = data.role;
 			  that.checkLogin();
 			} else {
@@ -557,31 +561,19 @@ submitReview() {
 			});
 		},
 
-    // 1 未處理
-    // 2 處理中
-    // 3 寄送中
-    // 4 已寄出
-    // 5 已送達
-    confirmOrder: function(id){ // 會變成2
-
-    },
-    shipOrder: function(id){ // 會變成3
-
-    },
-    getStatusText: function(statusCode){
-
-    },
     // 管理商家訂單物流
-		loadOrder: function () { 
-          const that = this;
-          fetch('controller.php?act=listOrder&userId=' + this.userId)
-            .then(function (response) {
-              return response.json();
-            })
-            .then(function (myJson) {
-              that.orderList = myJson;
-            });
-        },
+		loadOrder: function () {
+			const that = this; 
+			fetch('controller.php?act=listOrder&owner_Id=' + this.owner_Id)
+				.then(function (response) {
+					return response.json();
+				})
+				.then(function (myJson) {
+          console.log('API Response:', myJson);
+					that.orderList = myJson;
+				});
+		},
+
 		loadLogisticsOrders: function () {
 			const that = this;
 			fetch('controller.php?act=listLogisticsOrders')
