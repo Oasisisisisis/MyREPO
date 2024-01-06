@@ -224,6 +224,7 @@
 		  } else if (this.myRole === 99) { //99是商家
 			this.setUI('owner');
 			this.loadUserList();
+      this.loadOrder();
 		  } else if (this.myRole === 50){ //物流
 			this.setUI('logistics');
 			this.loadOrder();
@@ -549,7 +550,7 @@
     // 管理商家訂單物流
 		loadOrder: function () { 
           const that = this;
-          fetch('controller.php?act=listOrder')
+          fetch('controller.php?act=listOrder&userId=' + this.userId)
             .then(function (response) {
               return response.json();
             })
@@ -557,6 +558,7 @@
               that.orderList = myJson;
             });
         },
+
         setUI: function (page) {
           this.UI = page;
         }

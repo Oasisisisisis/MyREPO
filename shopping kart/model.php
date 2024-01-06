@@ -19,9 +19,9 @@ function getProductList()
 function getOrderListByOwner($owner_id)
 {
     global $db;
-    $sql = "SELECT id, client_id, owner_id, state FROM `order` WHERE owner_id = ?;"; 
+    $sql = "SELECT * FROM order WHERE user_id = ?;"; 
     $stmt = mysqli_prepare($db, $sql);
-    mysqli_stmt_bind_param($stmt, "s", $owner_id); // 商家用戶的id
+    mysqli_stmt_bind_param($stmt, "s", $user_id); // 商家用戶的id
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 
