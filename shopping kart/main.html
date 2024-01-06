@@ -229,12 +229,7 @@
 		  } else if (this.myRole === 99) { //99是商家
 			this.setUI('owner');
 			this.loadUserList();
-<<<<<<< HEAD
-      this.loadOrder();
-		  } else if (this.myRole === 50){ //物流
-=======
 		  } else if (this.myRole === 50) { // 物流角色
->>>>>>> ShoppingKart/master
 			this.setUI('logistics');
 			this.loadLogisticsOrders();
 		  }else {
@@ -587,9 +582,6 @@ submitReview() {
               that.orderList = myJson;
             });
         },
-<<<<<<< HEAD
-
-=======
 		loadLogisticsOrders: function () {
 			const that = this;
 			fetch('controller.php?act=listLogisticsOrders')
@@ -632,7 +624,6 @@ submitReview() {
 					return '未知';
 			}
 		},
->>>>>>> ShoppingKart/master
         setUI: function (page) {
           this.UI = page;
         }
