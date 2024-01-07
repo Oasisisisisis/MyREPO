@@ -15,7 +15,6 @@ function getProductList()
     }
     return $rows;
 }
-
 function getOrderListByOwner($owner_id)
 {
     global $db;
@@ -87,7 +86,6 @@ function getUserProductList($user_id)
     }
     return $rows;
 }
-
 
 function addProduct($name, $price, $detail, $remain, $id, $user_id)
 {
@@ -170,7 +168,20 @@ function checkout($cart, $user_id)
         return ["error" => "結帳時發生錯誤：" . $e->getMessage()];
     }
 }
+function loadReview($client_id) {
+  global $db;
+  $sql = "SELECT DISTINCT owner_id FROM `order` WHERE client_id = ? AND state = 5";
+  $stmt = mysqli_prepare($db, $sql);
+  mysqli_stmt_bind_param($stmt, "i", $client_id);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
 
+  $sellers = array();
+  while ($r = mysqli_fetch_assoc($result)) {
+    $sellers[] = $r['owner_id'];
+  }
+  return $sellers;
+}
 function getLogisticsOrders() {
     global $db;
     // 修改 SQL 查詢以僅返回客戶ID和商家ID的唯一組合
@@ -195,7 +206,13 @@ function updateOrderStatus($clientId, $ownerId) {
     return mysqli_stmt_execute($stmt);
 }
 
-
+function submitReview($ownerId, $clientId, $rating) {
+    global $db;
+    $sql = "UPDATE `order` SET review = ? WHERE owner_id = ? AND client_id = ? AND state = 5";
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, "iii", $rating, $ownerId, $clientId);
+    mysqli_stmt_execute($stmt);
+}
 // 這個函式用來獲取商品擁有者的 owner_id
 function getProductOwnerID($product_id)
 {
@@ -213,33 +230,6 @@ function getProductOwnerID($product_id)
     return null; // 如果找不到對應的商品擁有者，返回 null
 }
 
-
-function submitReviewToModel($order_id, $owner_id, $client_id, $state, $rating) {
-    global $conn;
-
-    // 根據訂單編號（order_id）從 order 表中獲取商家的 user_id
-    $sql = "SELECT owner_id FROM `order` WHERE `id` = '$order_id'";
-    $result = mysqli_query($conn, $sql);
-
-    if ($result && mysqli_num_rows($result) > 0) {
-        $row = mysqli_fetch_assoc($result);
-        $owner_id_from_order = $row['owner_id'];
-
-        // 檢查提交的 owner_id 是否與 order 表中的 owner_id 一致
-        if ($owner_id_from_order === $owner_id) {
-            // 插入評價表
-            $sql = "INSERT INTO `review` (`order_id`, `owner_id`, `client_id`, `state`, `rating`) 
-                    VALUES ('$order_id', '$owner_id', '$client_id', '$state', '$rating')";
-
-            // 執行 SQL 語句
-            $result = mysqli_query($conn, $sql);
-
-            return $result;
-        }
-    }
-
-    return false;
-}
 
 function getUserOrdersInfo($user_id)
 {

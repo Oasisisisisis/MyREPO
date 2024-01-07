@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2024-01-05 17:49:46
+-- 產生時間： 2024-01-07 14:39:04
 -- 伺服器版本： 10.4.24-MariaDB
 -- PHP 版本： 8.1.6
 
@@ -34,15 +34,6 @@ CREATE TABLE `cart` (
   `user_id` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- 傾印資料表的資料 `cart`
---
-
-INSERT INTO `cart` (`id`, `product_id`, `quantity`, `user_id`) VALUES
-(93, 16, 2, 'A'),
-(94, 17, 11, 'A'),
-(96, 18, 1, 'A');
-
 -- --------------------------------------------------------
 
 --
@@ -55,28 +46,21 @@ CREATE TABLE `order` (
   `quantity` int(11) NOT NULL,
   `client_id` varchar(10) NOT NULL,
   `owner_id` varchar(10) NOT NULL,
-  `state` int(5) NOT NULL
+  `state` int(5) NOT NULL,
+  `review` int(125) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- 傾印資料表的資料 `order`
 --
 
-INSERT INTO `order` (`id`, `product_id`, `quantity`, `client_id`, `owner_id`, `state`) VALUES
-(5, 15, 8, '2', '1', 1),
-(6, 16, 2, '2', '2', 1),
-(7, 17, 1, '2', '2', 1),
-(8, 18, 3, '2', '2', 1),
-(9, 21, 2, '2', '2', 1),
-(10, 15, 3, '2', '2', 1),
-(11, 15, 1, '2', '2', 1),
-(12, 15, 1, '2', '2', 1),
-(13, 15, 1, '2', '2', 1),
-(14, 15, 1, '2', '2', 1),
-(15, 15, 1, '2', '2', 1),
-(16, 17, 1, '2', '2', 1),
-(17, 18, 1, '2', '2', 1),
-(18, 15, 1, '2', '2', 1);
+INSERT INTO `order` (`id`, `product_id`, `quantity`, `client_id`, `owner_id`, `state`, `review`) VALUES
+(3, 15, 2, '2', '1', 4, 0),
+(4, 15, 1, '2', '1', 4, 0),
+(5, 16, 1, '2', '1', 4, 0),
+(6, 17, 1, '2', '11', 1, 0),
+(7, 18, 1, '2', '11', 1, 0),
+(8, 21, 1, '2', '1', 4, 0);
 
 -- --------------------------------------------------------
 
@@ -98,26 +82,11 @@ CREATE TABLE `product` (
 --
 
 INSERT INTO `product` (`id`, `name`, `price`, `remain`, `detail`, `user_id`) VALUES
-(15, 'coffee', 299, 4, 'good', '1'),
-(16, 'chocolate', 120, 22, 'goodgoodgood', '1'),
-(17, 'iphone', 50000, 10, 'iphone15', '123'),
-(18, 'happyNewYear', 2024, 27, 'hi', '123'),
-(21, 'pen', 10, 17, 'blue', '1');
-
--- --------------------------------------------------------
-
---
--- 資料表結構 `review`
---
-
-CREATE TABLE `review` (
-  `review_id` int(11) NOT NULL,
-  `order_id` int(123) NOT NULL,
-  `owner_id` varchar(123) NOT NULL,
-  `client_id` varchar(123) NOT NULL,
-  `state` int(123) NOT NULL,
-  `rating` int(123) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+(15, 'coffee', 299, 28, 'good', '1'),
+(16, 'chocolate', 120, 36, 'goodgoodgood', '1'),
+(17, 'iphone', 50000, 8, 'iphone15', '11'),
+(18, 'happyNewYear', 2024, 20, 'hi', '11'),
+(21, 'pen', 10, 13, 'blue', '1');
 
 -- --------------------------------------------------------
 
@@ -137,11 +106,10 @@ CREATE TABLE `user` (
 
 INSERT INTO `user` (`id`, `pwd`, `role`) VALUES
 ('1', '1', 99),
-('123', '123', 99),
+('11', '11', 99),
 ('2', '2', 1),
-('3', '3', 50),
-('A', '111', 1),
-('cool', 'aaaaa', 99);
+('22', '22', 1),
+('3', '3', 50);
 
 --
 -- 已傾印資料表的索引
@@ -167,12 +135,6 @@ ALTER TABLE `product`
   ADD PRIMARY KEY (`id`);
 
 --
--- 資料表索引 `review`
---
-ALTER TABLE `review`
-  ADD PRIMARY KEY (`review_id`);
-
---
 -- 資料表索引 `user`
 --
 ALTER TABLE `user`
@@ -186,25 +148,19 @@ ALTER TABLE `user`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `order`
 --
 ALTER TABLE `order`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `product`
 --
 ALTER TABLE `product`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
-
---
--- 使用資料表自動遞增(AUTO_INCREMENT) `review`
---
-ALTER TABLE `review`
-  MODIFY `review_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- 已傾印資料表的限制式

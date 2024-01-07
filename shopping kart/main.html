@@ -11,7 +11,7 @@
   </header>
   
   <div id="main"> <!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
-    <div class="modal" v-if="isCartOpen">
+	<div class="modal" v-if="isCartOpen">
       <div class="modal-content">
           <span class="close" @click="closeModal()">&times;</span>
           <h2>購物車內容</h2>
@@ -40,28 +40,8 @@
           <button @click="checkout">結帳</button>     
       </div>
     </div>
-
-    <div v-if="UI=='reviewForm'">
-	  <input type='button' @click="setUI('main')" value="返回"><br />
-      <h2>評價表單</h2>
-      
-      <label for="selectedOwner">選擇商家：</label>
-      <select v-model="reviewForm.selectedOwner">
-        <option v-for="orderItem in order" :value="orderItem.owner_id">{{ orderItem.owner_id }} </option>
-      </select>
-
-      <label for="rating">滿意度評價：</label>
-      <select v-model="reviewForm.rating">
-        <option value="1">1顆星</option>
-        <option value="2">2顆星</option>
-        <option value="3">3顆星</option>
-        <option value="4">4顆星</option>
-        <option value="5">5顆星</option>
-      </select>
-      <button @click="submitReview">提交評價</button>
-    </div>
-
-    <div id="list" v-if="UI=='main'"><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
+    
+	<div id="list" v-if="UI=='main'"><!-- main 一定要放vue 前面!!!!!!!!!!!!!!!!!-->
         <button @click="openModal()">查看購物車</button>
         <button @click="viewOrders()">查看訂單狀態</button>
         <button @click="showReviewForm()">評價</button>
@@ -87,7 +67,46 @@
 		  <input type='button' @click="logout()" value="logout"/>
     </div>
 	
+	<div v-if="UI=='orders'">
+	  <input type='button' @click="setUI('main')" value="返回">
+	  <h2>我的訂單</h2>
+	  <table border="1">
+		<tr>
+		  <th>訂單編號</th>
+		  <th>商品ID</th>
+		  <th>狀態</th>
+		</tr>
+		<tr v-for="order in orders">
+		  <td>{{ order.id }}</td>
+		  <td>{{ order.product_id }}</td>
+		  <td>{{ getStatusText(order.state) }}</td>
+		</tr>
+	  </table>
+	</div>
 	
+	<div v-if="UI=='review'">
+	  <input type='button' @click="setUI('main')" value="返回">
+	  <table>
+		<tr>
+		  <th>店家</th>
+		  <th>評分</th>
+		</tr>
+		<tr v-for="store in stores">
+		  <td>{{ store.owner_id }}</td>
+		  <td>
+			<select v-model="store.rating">
+			  <option value="1">1</option>
+			  <option value="2">2</option>
+			  <option value="3">3</option>
+			  <option value="4">4</option>
+			  <option value="5">5</option>
+			</select>
+		  </td>
+		</tr>
+	  </table>
+	  <button @click="submitReviews()">提交評價</button>
+	</div>
+
 	<div id="list" v-if="UI=='owner'">
       <header><h1>Owner</h1></header>
 	  </br>
@@ -142,7 +161,7 @@
         </tr>
       </table>
 	  <input type='button' @click="logout()" value="logout"/>
-    </div>
+    </div>	
 	
 	<div v-if="UI=='editForm'">
 	  </br>
@@ -152,7 +171,6 @@
 	  庫存: <input type="number" v-model="newProduct.remain"><br />
 	  <input type='button' @click="addProduct(newProduct)" value="save">
 	</div>
-
 	
 	<div v-if="UI=='loginForm'">
 		</br>
@@ -160,8 +178,8 @@
 		Password: <input type="text" v-model="pwd" />
 		<input type='button' @click="login()" value="login"/> <br/>
 		<button @click="showRegistrationForm()">註冊</button>
-	 </div>
-	 
+	 </div>	 
+	
 	<div v-if="UI=='registrationForm'">
 		<h2>註冊</h2>
 		<input type='button' @click="setUI('loginForm')" value="返回"><br />
@@ -174,7 +192,7 @@
 		</select> <br />
 		<input type='button' @click="register()" value="註冊">
 	</div>
-
+	
 	<div v-if="UI=='logistics'">
 	  <header><h1>Logistics</h1></header>
 	  <table border=1>
@@ -194,44 +212,34 @@
 	  </table>
 	  <input type='button' @click="logout()" value="logout"/>
 	</div>
-
-
   </div>
-
-
-
   <script>
     const productApp = Vue.createApp({
 	  data() {
 	    return {
 		  UI: 'main',
 		  dat: [],
-	  	isCartOpen: false,
-	  	cart : [],
-	  	totalPrice: 0,
-	  	userId: null,
-	  	myRole: 0, //來存註冊者的角色
-	  	orderList: [],
-		id:null,
-		pwd:null,
-      reviewForm: {
-      owner_id: null,
-      state:null,
-      rating: 1, // 預設1顆星
-      
-        },
-	    }
+		  isCartOpen: false,
+		  cart : [],
+		  totalPrice: 0,
+		  userId: null,
+		  myRole: 0, //來存註冊者的角色
+		  orderList: [],
+		  id:null,
+		  pwd:null,
+		  stores: [],
+		  orders: [],
+		}
 	  },
-
       methods: {
-		  checkLogin: function() {
+		checkLogin: function() {
 		  if (this.myRole === 1) { //1是客戶
 			this.setUI('main');
 			this.loadAllList();
 		  } else if (this.myRole === 99) { //99是商家
 			this.setUI('owner');
 			this.loadUserList();
-      this.loadOrder();
+			this.loadOrder();
 		  } else if (this.myRole === 50) { // 物流角色
 			this.setUI('logistics');
 			this.loadLogisticsOrders();
@@ -240,44 +248,43 @@
  		  }
 		  },
 		login: function() { //登入後與後台確認是否正確
-		  const that = this;
-		  let mydat = new FormData();
-		  mydat.append("id", this.id);
-		  mydat.append("pwd", this.pwd);
-		  mydat.append("act", 'login');
-		  let url = "controller.php";
-		  fetch(url, {
-			method: 'POST',
-			body: mydat
-		  })
-		  .then(function(res) {
-			return res.json();
-		  })
-		  .then(function(data) {
-			console.log(data);
-			if (data.role > 0) {
-			  that.userId = data.id; //將id存起來 以便後面判斷對應其項目
-        that.owner_Id = data.id
-			  that.myRole = data.role;
-			  that.checkLogin();
-			} else {
-			  alert("登入失敗");
-			}
-		  });
-		},
+			  const that = this;
+			  let mydat = new FormData();
+			  mydat.append("id", this.id);
+			  mydat.append("pwd", this.pwd);
+			  mydat.append("act", 'login');
+			  let url = "controller.php";
+			  fetch(url, {
+				method: 'POST',
+				body: mydat
+			  })
+			  .then(function(res) {
+				return res.json();
+			  })
+			  .then(function(data) {
+				console.log(data);
+				if (data.role > 0) {
+				  that.userId = data.id; //將id存起來 以便後面判斷對應其項目
+				  that.myRole = data.role;
+				  that.checkLogin();
+				} else {
+				  alert("登入失敗");
+				}
+			  });
+			},
 		logout: function() {
-		  const that=this;
-		  let url="controller.php?act=logout";
-		  fetch(url)
-		  .then(function(res){return res.text(); }) 
-		  .then(function(data){
-			that.userId = null;  //登出把資料都清掉
-			that.myRole = 0;
-			that.checkLogin();
-		  })
-		},
+			  const that=this;
+			  let url="controller.php?act=logout";
+			  fetch(url)
+			  .then(function(res){return res.text(); }) 
+			  .then(function(data){
+				that.userId = null;  //登出把資料都清掉
+				that.myRole = 0;
+				that.checkLogin();
+			  })
+			},
         
-    loadAllList: function () { //在客戶頁面列出所有商品內容
+		loadAllList: function () { //在客戶頁面列出所有商品內容
       const that = this;
       fetch('controller.php?act=listProduct')
         .then(function (response) {
@@ -381,106 +388,23 @@
     alert('結帳時發生錯誤');
   });
     },
-    viewOrders: function() {
-    const that = this;
+		viewOrders: function() {
+		  const that = this;
+		  let url = "controller.php?act=viewOrders&userId=" + this.userId;
 
-    // 使用後端 API 取得訂單狀態資訊
-    let url = "controller.php?act=viewOrders&userId=" + this.userId;
-
-    fetch(url)
-      .then(function(response) {
-        return response.json();
-      })
-      .then(function(data) {
-        // 在這裡處理後端返回的訂單狀態資訊
-        if (data && data.length > 0) {
-          // 顯示訂單狀態
-          // 這裡只是簡單地使用 alert 顯示
-          let orderStatus = "訂單狀態：\n";
-          data.forEach(order => {
-            orderStatus += `訂單編號: ${order.id}, 商品名稱: ${order.product_id}, 狀態: ${order.state}\n`;
-          });
-
-          alert(orderStatus);
-        } else {
-          alert("沒有找到相關訂單資訊");
-        }
-      })
-      .catch(function(error) {
-        console.error('Error fetching order status:', error);
-        alert('取得訂單狀態時發生錯誤');
-      });
-  },
-  showReviewForm(owner_id) {
-  const that = this;
-  if (this.reviewForm) {
-    this.reviewForm.owner_id = owner_id;
-    this.setUI('reviewForm');
-  } else {
-    alert("評價表單未初始化");
-    this.reviewForm.owner_id = owner_id;
-    this.setUI('reviewForm');
-  }
-
-  // 在这里调用获取订单信息的方法
-  let url = "controller.php?act=viewOrdersInfo&userId=" + this.userId;
-  fetch(url)
-    .then(function(response) {
-      return response.json();
-    })
-    .then(function(data) {
-      // 在这里更新评价表单中的商家选择下拉框
-      that.order = data;
-
-      // 手动强制更新 Vue 组件
-      that.$forceUpdate();
-    })
-    .catch(function(error) {
-      console.error('Error fetching orders:', error);
-      alert('获取订单时发生错误');
-    });
-},
-submitReview() {
-  // 在這裡處理提交評價的相應操作
-
-  // 檢查訂單狀態是否為5（已送達）
-  if (this.reviewForm.order_state !== 5) {
-    alert('只有在訂單已送達的狀態下才能進行評價。');
-    return;
-  }
-
-  // 使用 this.reviewForm.selectedOwner 來獲取選定的商家
-  const selectedOwner = this.reviewForm.selectedOwner;
-
-  fetch('controller.php?act=submitReview', {
-    method: 'POST',
-    body: JSON.stringify({
-      order_id: this.reviewForm.order_id,
-      owner_id: selectedOwner, // 使用選定的商家
-      client_id: this.reviewForm.client_id,
-      rating: this.reviewForm.rating,
-      // 其他評價表單相關屬性
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-    .then(response => response.json())
-    .then(data => {
-      console.log(data);
-      if (data.message === 'OK') {
-        alert('評價成功');
-        this.setUI('main');
-      } else {
-        alert('評價失敗');
-      }
-    })
-    .catch(error => {
-      console.error('Error submitting review:', error);
-      alert('評價時發生錯誤');
-    });
-},
-   
+		  fetch(url)
+			.then(function(response) {
+			  return response.json();
+			})
+			.then(function(data) {
+			  that.orders = data;
+			  that.setUI('orders'); // 切換到訂單 UI
+			})
+			.catch(function(error) {
+			  console.error('Error fetching order status:', error);
+			  alert('取得訂單狀態時發生錯誤');
+			});
+		},
 		del: function (id) {
           const that = this;
           let url = "controller.php?act=del&id=" + id;
@@ -515,7 +439,7 @@ submitReview() {
           this.newProduct = product;
           this.setUI('editForm');
         },
-        setAddUI: function () {
+		setAddUI: function () {
           this.newProduct = {
             id: -1,
             name: '',
@@ -564,7 +488,7 @@ submitReview() {
     // 管理商家訂單物流
 		loadOrder: function () {
 			const that = this; 
-			fetch('controller.php?act=listOrder&owner_Id=' + this.owner_Id)
+			fetch('controller.php?act=listOrder&owner_Id=' + this.userId)
 				.then(function (response) {
 					return response.json();
 				})
@@ -574,73 +498,73 @@ submitReview() {
 				});
 		},
     // change to state 1
-    unconfirmOrder: function(orderId) {
-      const that = this;
-			let url = "controller.php?act=unconfirmOrder&orderId=" + orderId;
-			fetch(url, { method: 'POST' })
-				.then(() => {
-					that.loadOrder(); 
-					that.setUI('owner');
-				})
-				.catch(error => {
-					console.error('Error updating order status:', error);
-				});
-},
+		unconfirmOrder: function(orderId) {
+		  const that = this;
+				let url = "controller.php?act=unconfirmOrder&orderId=" + orderId;
+				fetch(url, { method: 'POST' })
+					.then(() => {
+						that.loadOrder(); 
+						that.setUI('owner');
+					})
+					.catch(error => {
+						console.error('Error updating order status:', error);
+					});
+		},
     // change to state 2
-  confirmOrder: function(orderId) {
-    const that = this;
-			let url = "controller.php?act=confirmOrder&orderId=" + orderId;
-			fetch(url, { method: 'POST' })
-				.then(() => {
-					that.loadOrder(); 
-					that.setUI('owner');
-				})
-				.catch(error => {
-					console.error('Error updating order status:', error);
-				});
-},
+		confirmOrder: function(orderId) {
+			const that = this;
+					let url = "controller.php?act=confirmOrder&orderId=" + orderId;
+					fetch(url, { method: 'POST' })
+						.then(() => {
+							that.loadOrder(); 
+							that.setUI('owner');
+						})
+						.catch(error => {
+							console.error('Error updating order status:', error);
+						});
+		},
 
 
     // change to state3
-    shipOrder: function(orderId){
-      const that = this;
-			let url = "controller.php?act=shipOrder&orderId=" + orderId;
-			fetch(url, { method: 'POST' })
-				.then(() => {
-					that.loadOrder(); 
-					that.setUI('owner');
-				})
-				.catch(error => {
-					console.error('Error updating order status:', error);
-				});
-    },
+		shipOrder: function(orderId){
+		  const that = this;
+				let url = "controller.php?act=shipOrder&orderId=" + orderId;
+				fetch(url, { method: 'POST' })
+					.then(() => {
+						that.loadOrder(); 
+						that.setUI('owner');
+					})
+					.catch(error => {
+						console.error('Error updating order status:', error);
+					});
+		},
 
     // change to state 4
-    deliverOrder: function(orderId){
-      const that = this;
-			let url = "controller.php?act=deliverOrder&orderId=" + orderId;
-			fetch(url, { method: 'POST' })
-				.then(() => {
-					that.loadOrder(); 
-					that.setUI('owner');
-				})
-				.catch(error => {
-					console.error('Error updating order status:', error);
-				});
-    },
-    // change to state 5
-    arriveOrder: function(orderId){
-      const that = this;
-			let url = "controller.php?act=arriveOrder&orderId=" + orderId;
-			fetch(url, { method: 'POST' })
-				.then(() => {
-					that.loadOrder(); 
-					that.setUI('owner');
-				})
-				.catch(error => {
-					console.error('Error updating order status:', error);
-				});
-    },
+		deliverOrder: function(orderId){
+		  const that = this;
+				let url = "controller.php?act=deliverOrder&orderId=" + orderId;
+				fetch(url, { method: 'POST' })
+					.then(() => {
+						that.loadOrder(); 
+						that.setUI('owner');
+					})
+					.catch(error => {
+						console.error('Error updating order status:', error);
+					});
+		},
+		// change to state 5
+		arriveOrder: function(orderId){
+		  const that = this;
+				let url = "controller.php?act=arriveOrder&orderId=" + orderId;
+				fetch(url, { method: 'POST' })
+					.then(() => {
+						that.loadOrder(); 
+						that.setUI('owner');
+					})
+					.catch(error => {
+						console.error('Error updating order status:', error);
+					});
+		},
 
 		loadLogisticsOrders: function () {
 			const that = this;
@@ -667,7 +591,6 @@ submitReview() {
 					console.error('Error updating order status:', error);
 				});
 		},
-
 		getStatusText: function(statusCode) {
 			switch(statusCode) {
 				case 1:
@@ -684,6 +607,53 @@ submitReview() {
 					return '未知';
 			}
 		},
+		showReviewForm() {
+			this.UI = 'review';
+			this.loadReview();
+		},
+		submitReviews: function() {
+			const that = this;
+			this.stores.forEach(store => {
+			  let mydat = new FormData();
+			  mydat.append("ownerId", store.owner_id);
+			  mydat.append("clientId", this.userId);
+			  mydat.append("rating", store.rating);
+
+			  fetch("controller.php?act=submitReview", {
+				method: 'POST',
+				body: mydat
+			  })
+			  .then(function(response) {
+				return response.text();
+			  })
+			  .then(function(data) {
+				console.log(data);
+			  });
+			});
+
+			alert("評價已提交");
+			that.UI = 'main';
+		  },
+		loadReview() {
+		  const that = this;
+		  let url = "controller.php?act=loadReview&userId=" + this.userId;
+		  fetch(url)
+		  .then(function(response) {
+			return response.json();
+		  })
+		  .then(function(data) {
+			console.log(data);
+			if (Array.isArray(data)) {
+			  that.stores = data.map(ownerId => {
+				return { owner_id: ownerId, rating: 3 }; // 預設評分為 3
+			  });
+			}
+		  })
+		  .catch(function(error) {
+			console.error('Error loading reviews:', error);
+		  });
+		},
+
         setUI: function (page) {
           this.UI = page;
         }
